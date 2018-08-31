@@ -5,6 +5,7 @@ import com.bootdo.common.domain.Attachment;
 import com.bootdo.common.service.AttachmentService;
 import com.bootdo.common.utils.*;
 import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.FileVo;
 import com.bootdo.common.vo.ResultMessage;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -12,8 +13,10 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -23,10 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by wangfei on 2016/6/8.
@@ -60,7 +60,13 @@ public class WebUploaderController extends BaseController {
      * @throws Exception
      */
     @GetMapping("")
-    public String page() throws Exception {
+    public String page(Model model) throws Exception {
+        List<FileVo> fileVoList = attachmentService.listFlie();
+        model.addAttribute("fileList", fileVoList);
+        List<String> stringList = new ArrayList<>();
+        stringList.add("aaa");
+        stringList.add("bbb");
+        model.addAttribute("stringList", stringList);
         return "common/webupload/initPage";
     }
 

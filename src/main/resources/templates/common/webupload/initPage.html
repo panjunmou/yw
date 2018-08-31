@@ -1,27 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bootdo - 文件管理器</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link rel="shortcut icon" href="favicon.ico">
-    <link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
-    <link href="/css/font-awesome.css?v=4.4.0" rel="stylesheet">
-    <link href="/css/animate.css" rel="stylesheet">
-    <link href="/css/layui.css" rel="stylesheet">
-    <link href="/css/style.css?v=4.1.0" rel="stylesheet">
-    <style>
-        .aactive {
-            color: #13b5b7 !important;
-        }
-        .hactive:hover{
-            color: #13b5b7 !important;
-        }
-    </style>
 </head>
 <body class="gray-bg">
-Hello
+<ul>
+    <li th:each="file:${fileList}">
+        <span th:text="${file.fileName}"></span>
+    </li>
+</ul>
 </body>
 </html>

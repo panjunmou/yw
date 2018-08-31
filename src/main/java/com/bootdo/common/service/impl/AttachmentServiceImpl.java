@@ -7,6 +7,7 @@ import com.bootdo.common.utils.BeanMapper;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.FileVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,38 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Resource
     private AttachmentDao attachmentDao;
+
+    /**
+     * 获取文件列表
+     * @return
+     */
+    @Override
+    public List<FileVo> listFlie() {
+        File fileDir = new File("G:/");
+        List<FileVo> fileVoList = new ArrayList<>();
+        if (fileDir.exists()) {
+            File[] listFiles = fileDir.listFiles();
+            for (File file : listFiles) {
+                String fullName = file.getName();
+                String fileName = fullName;
+                String prefix = "";
+                if (fullName.indexOf(".") > 0) {
+                    prefix = fullName.substring(fullName.lastIndexOf(".") + 1);
+                    fileName = fullName.substring(0,fullName.lastIndexOf(".") );
+                }
+                boolean directory = file.isDirectory();
+                boolean hidden = file.isHidden();
+                FileVo fileVo = new FileVo();
+                fileVo.setFullName(fullName);
+                fileVo.setFileName(fileName);
+                fileVo.setPrefix(prefix);
+                fileVo.setDictory(directory);
+                fileVo.setHidden(hidden);
+                fileVoList.add(fileVo);
+            }
+        }
+        return fileVoList;
+    }
 
     @Override
     public AttachmentVO addAttachment(String newPath, String attachPath, String oriFileName, String extName, Long size, String md5) {
