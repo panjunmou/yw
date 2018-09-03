@@ -2,6 +2,8 @@ package com.bootdo.common.vo;
 
 public class FileVo {
 
+    private String id;
+
     //文件全名
     private String fullName;
 
@@ -11,11 +13,28 @@ public class FileVo {
     //后缀
     private String prefix;
 
+    //路径
+    private String path;
+
+    //路径
+    private String absolutePath;
+
+    //路径
+    private String canonicalPath;
+
     //是否文件夹
     private Boolean isDictory;
 
     //是否隐藏
     private Boolean isHidden;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getFullName() {
         return fullName;
@@ -55,5 +74,29 @@ public class FileVo {
 
     public void setHidden(Boolean hidden) {
         isHidden = hidden;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
+    }
+
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
+    }
+
+    public String getCanonicalPath() {
+        return canonicalPath;
+    }
+
+    public void setCanonicalPath(String canonicalPath) {
+        this.canonicalPath = canonicalPath;
     }
 }

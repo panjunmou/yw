@@ -1,6 +1,7 @@
 bootdo:
   uploadPath: c:/var/uploaded_files/
   attachPath: /overseas/client_upload/
+  attachBasePath: G:/
 logging:
   level:
     root: info

@@ -4,14 +4,96 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bootdo - 文件管理器</title>
-    <meta name="keywords" content="">
-    <meta name="description" content="">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/css/animate.css" rel="stylesheet">
+    <link href="/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 <body class="gray-bg">
-<ul>
-    <li th:each="file:${fileList}">
-        <span th:text="${file.fileName}"></span>
-    </li>
-</ul>
+<ol class="breadcrumb">
+     <li th:each="path,pathStart:${pathList}" th:class="${pathStart.last} ? 'active'">
+         <span th:if="${!pathStart.last}">
+              <a href="#" th:text="${path}"></a>
+         </span>
+         <span th:if="${pathStart.last}">
+              <span href="#" th:text="${path}"></span>
+         </span>
+     </li>
+    <!--<li class="active">Data</li>-->
+</ol>
+<div class="row" id="fileListDiv">
+    <!--<div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+            <img src="/img/a1.jpg" alt="提示">
+            <div class="caption">
+                <h3>Thumbnail label</h3>
+                <p>...</p>
+                <p>
+                    <a href="#" class="btn btn-primary" role="button">Button</a>
+                    <a href="#" class="btn btn-default" role="button">Button</a>
+                </p>
+            </div>
+        </div>
+    </div>-->
+</div>
+<!-- 全局js -->
+<script src="/js/jquery.min.js?v=2.1.4"></script>
+<script src="/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/js/jquery.blockUI.js"></script>
+<script src="/js/ajaxExt.js"></script>
+<script src="/js/plugins/toastr/toastr.min.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    toastr.options = {
+        closeButton: true,
+        positionClass: "toast-center-center",
+        timeOut: "1300"
+    };
+    $(function () {
+        var path = [[${path}]];
+        $.ajaxExt({
+            url: 'webupload/listFile',
+            type: 'GET',
+            data: {
+                path: path
+            },
+            success: function (result) {
+                if (result.result == 1) {
+                    var fileList = result.data;
+                    $.each(fileList, function (i, v) {
+                        if (!v.hidden) {
+                            var fileStr =
+                                '<div class="col-sm-6 col-md-4">\n' +
+                                '        <div class="thumbnail">\n' +
+                                '            <img src="/img/a1.jpg" alt="提示">\n' +
+                                '            <div class="caption">\n' +
+                                '                <h3>' + v.fullName + '</h3>\n' +
+                                '                <p>...</p>\n' +
+                                '                <p>\n';
+                            if (v.dictory) {
+                                var path = v.canonicalPath;
+                                fileStr += '<a href="#" class="btn btn-primary" role="button" id="' + v.id + '_open">打开</a>\n';
+                            }
+                            fileStr +=
+                                '                    <a href="#" class="btn btn-primary" role="button">下载</a>\n';
+                            '                </p>\n' +
+                            '            </div>\n' +
+                            '        </div>\n' +
+                            '    </div>';
+                            $("#fileListDiv").append(fileStr);
+                            $("#" + v.id + '_open').on('click', function () {
+                                window.location.href = 'webupload?path=' + v.canonicalPath;
+                            });
+                        }
+                    });
+                } else {
+                    toastr.error(result.message);
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>

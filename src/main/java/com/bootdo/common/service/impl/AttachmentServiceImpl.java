@@ -1,5 +1,6 @@
 package com.bootdo.common.service.impl;
 
+import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.dao.AttachmentDao;
 import com.bootdo.common.domain.Attachment;
 import com.bootdo.common.service.AttachmentService;
@@ -13,9 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by wangfei on 2016/4/25.
@@ -29,14 +28,19 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Resource
     private AttachmentDao attachmentDao;
+    @Resource
+    private BootdoConfig bootdoConfig;
 
     /**
      * 获取文件列表
+     *
+     * @param queryParamMap
      * @return
      */
     @Override
-    public List<FileVo> listFlie() {
-        File fileDir = new File("G:/");
+    public List<FileVo> listFlie(Map<String, Object> queryParamMap) throws Exception {
+        String curPath = queryParamMap.get("path") == null ? bootdoConfig.getAttachBasePath() : (String) queryParamMap.get("path");
+        File fileDir = new File(curPath);
         List<FileVo> fileVoList = new ArrayList<>();
         if (fileDir.exists()) {
             File[] listFiles = fileDir.listFiles();
@@ -46,16 +50,23 @@ public class AttachmentServiceImpl implements AttachmentService {
                 String prefix = "";
                 if (fullName.indexOf(".") > 0) {
                     prefix = fullName.substring(fullName.lastIndexOf(".") + 1);
-                    fileName = fullName.substring(0,fullName.lastIndexOf(".") );
+                    fileName = fullName.substring(0, fullName.lastIndexOf("."));
                 }
                 boolean directory = file.isDirectory();
                 boolean hidden = file.isHidden();
+                String path = file.getPath().replaceAll("\\\\", "/");
+                String absolutePath = file.getAbsolutePath().replaceAll("\\\\", "/");
+                String canonicalPath = file.getCanonicalPath().replaceAll("\\\\", "/");
                 FileVo fileVo = new FileVo();
                 fileVo.setFullName(fullName);
                 fileVo.setFileName(fileName);
                 fileVo.setPrefix(prefix);
                 fileVo.setDictory(directory);
                 fileVo.setHidden(hidden);
+                fileVo.setPath(path);
+                fileVo.setAbsolutePath(absolutePath);
+                fileVo.setCanonicalPath(canonicalPath);
+                fileVo.setId(UUID.randomUUID().toString());
                 fileVoList.add(fileVo);
             }
         }
@@ -115,7 +126,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     public AttachmentVO getById(Long id) {
         AttachmentVO vo = new AttachmentVO();
         Attachment attachment = attachmentDao.findById(id).get();
-        BeanUtils.copyProperties(attachment,vo);
+        BeanUtils.copyProperties(attachment, vo);
         return vo;
     }
 

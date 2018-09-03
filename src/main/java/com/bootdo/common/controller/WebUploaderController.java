@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -39,7 +38,7 @@ public class WebUploaderController extends BaseController {
     /**
      * 日志
      */
-    private static Logger LOGGER = LoggerFactory.getLogger(WebUploaderController.class);
+    private static Logger logger = LoggerFactory.getLogger(WebUploaderController.class);
 
     @Resource
     private AttachmentService attachmentService;
@@ -60,14 +59,36 @@ public class WebUploaderController extends BaseController {
      * @throws Exception
      */
     @GetMapping("")
-    public String page(Model model) throws Exception {
-        List<FileVo> fileVoList = attachmentService.listFlie();
-        model.addAttribute("fileList", fileVoList);
-        List<String> stringList = new ArrayList<>();
-        stringList.add("aaa");
-        stringList.add("bbb");
-        model.addAttribute("stringList", stringList);
+    public String page(Model model, HttpServletRequest request) throws Exception {
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        String curPath = queryParamMap.get("path") == null ? "" : (String) queryParamMap.get("path");
+        model.addAttribute("path", curPath);
+        List<String> pathList = new ArrayList<>();
+        pathList.add("主目录");
+        if (StringUtils.isNotEmpty(curPath)) {
+            String[] dir = curPath.replace(bootdoConfig.getAttachBasePath(), "").split("/");
+            for (String pathName : dir) {
+                pathList.add(pathName);
+            }
+        }
+        model.addAttribute("pathList", pathList);
         return "common/webupload/initPage";
+    }
+
+    @GetMapping("/listFile")
+    @ResponseBody
+    public ResultMessage listFile(HttpServletRequest request) {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        try {
+            List<FileVo> fileVoList = attachmentService.listFlie(queryParamMap);
+            resultMessage.setData(fileVoList);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            resultMessage.setResult(ResultMessage.Error);
+            resultMessage.setMessage("listFile Error");
+        }
+        return resultMessage;
     }
 
     /**
@@ -82,7 +103,7 @@ public class WebUploaderController extends BaseController {
     @GetMapping("/isExistWholeFile")
     @ResponseBody
     public ResultMessage isExistWholeFile(String wholeMd5, String fileName, String ext) {
-        LOGGER.info(String.format("%20s md5:%s  fileName:%s", "isExistWholeFile", wholeMd5, fileName));
+        logger.info(String.format("%20s md5:%s  fileName:%s", "isExistWholeFile", wholeMd5, fileName));
         ResultMessage mes = new ResultMessage();
         List<Attachment> poList = attachmentService.findByFileMd5(wholeMd5);
         //数据库copy一份数据。
@@ -124,7 +145,7 @@ public class WebUploaderController extends BaseController {
         Integer chunksNum = Integer.parseInt(request.getParameter("chunks"));
         Integer chunk = Integer.parseInt(request.getParameter("chunk")); //当前分片
         String wholeMd5 = request.getParameter("wholeMd5");//整个文件的md5值
-        LOGGER.info(String.format("%20s md5:%s  %s/%s", "checkSliceUploaded", wholeMd5, chunk + 1, chunksNum));
+        logger.info(String.format("%20s md5:%s  %s/%s", "checkSliceUploaded", wholeMd5, chunk + 1, chunksNum));
         File chunkFile = new File(getChunkFilePath(wholeMd5), getChunkFileName(chunksNum, chunk, md5));
         if (chunkFile.exists()) {
             String serverMd5 = CommonUtils.getMd5ByFile(chunkFile);
@@ -182,7 +203,7 @@ public class WebUploaderController extends BaseController {
 
         String chunkFileName = getChunkFileName(chunksNum, chunk, md5);
         File f = new File(getChunkFilePath(wholeMd5), chunkFileName);
-        LOGGER.info(String.format("%20s md5:%s  %s/%s to %s", "upload", wholeMd5, chunk + 1, chunksNum, f.getAbsolutePath()));
+        logger.info(String.format("%20s md5:%s  %s/%s to %s", "upload", wholeMd5, chunk + 1, chunksNum, f.getAbsolutePath()));
 
         FileUtils.writeByteArrayToFile(f, file.getBytes());
         return mes;
@@ -203,7 +224,7 @@ public class WebUploaderController extends BaseController {
                 getFileStorePath() + File.separator + "upload_files" + File.separator + ShiroUtils.getUserId(),
                 wholeMd5 + "_" + DateUtils.format(new Date(), "HHmmss") + "." + extName); //合并完成后移动到新文件夹，并删除临时文件夹
         String md5FilePath = getChunkFilePath(wholeMd5);
-        LOGGER.info(String.format("%20s md5:%s  fileName:%s from %s to %s", "fileMerge", wholeMd5, originalFileName, md5FilePath, newPath));
+        logger.info(String.format("%20s md5:%s  fileName:%s from %s to %s", "fileMerge", wholeMd5, originalFileName, md5FilePath, newPath));
 
         File[] fileList = new File(md5FilePath).listFiles(new FilenameFilter() {
 
@@ -274,7 +295,7 @@ public class WebUploaderController extends BaseController {
         if (StringUtil.isNotEmpty(wholeMd5)) {
             FileUtils.deleteDirectory(new File(getChunkFilePath(wholeMd5)));// 删除临时目录中的分片文件
         } else {
-            LOGGER.error("删除临时文件夹:" + fileName + "失败");
+            logger.error("删除临时文件夹:" + fileName + "失败");
         }
         return mes;
     }

@@ -3593,17 +3593,17 @@ img.circle-border {
 
 .breadcrumb {
     background-color: #ffffff;
-    padding: 0;
+    padding: 15px;
     margin-bottom: 0;
 }
-
+/*
 .breadcrumb>li a {
     color: inherit;
 }
 
 .breadcrumb>.active {
     color: inherit;
-}
+}*/
 
 code {
     background-color: #F9F2F4;
