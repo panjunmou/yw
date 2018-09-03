@@ -63,12 +63,18 @@ public class WebUploaderController extends BaseController {
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         String curPath = queryParamMap.get("path") == null ? "" : (String) queryParamMap.get("path");
         model.addAttribute("path", curPath);
-        List<String> pathList = new ArrayList<>();
-        pathList.add("主目录");
+        List<FileVo> pathList = new ArrayList<>();
+        FileVo mainFile = new FileVo();
+        mainFile.setFileName("主目录");
+        mainFile.setCanonicalPath(bootdoConfig.getAttachBasePath());
+        pathList.add(mainFile);
         if (StringUtils.isNotEmpty(curPath)) {
             String[] dir = curPath.replace(bootdoConfig.getAttachBasePath(), "").split("/");
             for (String pathName : dir) {
-                pathList.add(pathName);
+                FileVo fileVo = new FileVo();
+                fileVo.setFileName(pathName);
+
+                pathList.add(fileVo);
             }
         }
         model.addAttribute("pathList", pathList);

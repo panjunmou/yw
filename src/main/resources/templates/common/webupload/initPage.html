@@ -13,16 +13,17 @@
 </head>
 <body class="gray-bg">
 <ol class="breadcrumb">
-     <li th:each="path,pathStart:${pathList}" th:class="${pathStart.last} ? 'active'">
+     <li th:each="file,pathStart:${pathList}" th:class="${pathStart.last} ? 'active'">
          <span th:if="${!pathStart.last}">
-              <a href="#" th:text="${path}"></a>
+              <a href="#" th:text="${file.canonicalPath}"></a>
          </span>
          <span th:if="${pathStart.last}">
-              <span href="#" th:text="${path}"></span>
+              <span href="#" th:text="${file.canonicalPath}"></span>
          </span>
      </li>
     <!--<li class="active">Data</li>-->
 </ol>
+<button type="button" class="btn btn-primary">上传文件</button>
 <div class="row" id="fileListDiv">
     <!--<div class="col-sm-6 col-md-4">
         <div class="thumbnail">
