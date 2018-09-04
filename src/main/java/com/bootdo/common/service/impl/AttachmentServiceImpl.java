@@ -1,11 +1,10 @@
 package com.bootdo.common.service.impl;
 
 import com.bootdo.common.config.BootdoConfig;
-import com.bootdo.common.dao.AttachmentDao;
-import com.bootdo.common.domain.Attachment;
+import com.bootdo.common.dao.SysAttachmentDao;
+import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.AttachmentService;
 import com.bootdo.common.utils.BeanMapper;
-import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.AttachmentVO;
 import com.bootdo.common.vo.FileVo;
@@ -14,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangfei on 2016/4/25.
@@ -27,9 +29,11 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 附件dao
      */
     @Resource
-    private AttachmentDao attachmentDao;
+    private SysAttachmentDao attachmentDao;
     @Resource
     private BootdoConfig bootdoConfig;
+    @Resource
+    private SysAttachmentDao sysAttachmentDao;
 
     /**
      * 获取文件列表
@@ -39,38 +43,8 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     public List<FileVo> listFlie(Map<String, Object> queryParamMap) throws Exception {
-        String curPath = queryParamMap.get("path") == null ? bootdoConfig.getAttachBasePath() : (String) queryParamMap.get("path");
-        File fileDir = new File(curPath);
-        List<FileVo> fileVoList = new ArrayList<>();
-        if (fileDir.exists()) {
-            File[] listFiles = fileDir.listFiles();
-            for (File file : listFiles) {
-                String fullName = file.getName();
-                String fileName = fullName;
-                String prefix = "";
-                if (fullName.indexOf(".") > 0) {
-                    prefix = fullName.substring(fullName.lastIndexOf(".") + 1);
-                    fileName = fullName.substring(0, fullName.lastIndexOf("."));
-                }
-                boolean directory = file.isDirectory();
-                boolean hidden = file.isHidden();
-                String path = file.getPath().replaceAll("\\\\", "/");
-                String absolutePath = file.getAbsolutePath().replaceAll("\\\\", "/");
-                String canonicalPath = file.getCanonicalPath().replaceAll("\\\\", "/");
-                FileVo fileVo = new FileVo();
-                fileVo.setFullName(fullName);
-                fileVo.setFileName(fileName);
-                fileVo.setPrefix(prefix);
-                fileVo.setDictory(directory);
-                fileVo.setHidden(hidden);
-                fileVo.setPath(path);
-                fileVo.setAbsolutePath(absolutePath);
-                fileVo.setCanonicalPath(canonicalPath);
-                fileVo.setId(UUID.randomUUID().toString());
-                fileVoList.add(fileVo);
-            }
-        }
-        return fileVoList;
+
+        return null;
     }
 
     @Override
@@ -82,13 +56,10 @@ public class AttachmentServiceImpl implements AttachmentService {
         vo.setPersistedFileName(
                 f1.getAbsolutePath().replace(f2.getAbsolutePath() + File.separator, "").replaceAll("\\\\", "/"));
         vo.setFileSize(size);
-        vo.setOwnerId(ShiroUtils.getUser().getUserId().toString());
-        vo.setOwner(ShiroUtils.getUser().getUsername());
         vo.setCreateDate(new Date());
         vo.setFileExt(extName);
-        vo.setDelFlag(0);
         vo.setFileMd5(md5);
-        Attachment attachment = new Attachment();
+        SysAttachment attachment = new SysAttachment();
         BeanUtils.copyProperties(vo, attachment);
         attachment = attachmentDao.save(attachment);
         AttachmentVO rvo = new AttachmentVO();
@@ -101,9 +72,9 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     public Long add(AttachmentVO vo) {
-        Attachment attachment = new Attachment();
+        SysAttachment attachment = new SysAttachment();
         BeanUtils.copyProperties(vo, attachment);
-        Attachment att = attachmentDao.save(attachment);
+        SysAttachment att = attachmentDao.save(attachment);
         return att.getId();
     }
 
@@ -125,7 +96,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public AttachmentVO getById(Long id) {
         AttachmentVO vo = new AttachmentVO();
-        Attachment attachment = attachmentDao.findById(id).get();
+        SysAttachment attachment = attachmentDao.findById(id).get();
         BeanUtils.copyProperties(attachment, vo);
         return vo;
     }
@@ -141,7 +112,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         String[] idsArr = ids.split("\\,");
         for (int i = 0; i < idsArr.length; i++) {
             if (StringUtil.isNotEmpty(idsArr[i])) {
-                Attachment po = attachmentDao.findById(Long.valueOf(idsArr[i])).get();
+                SysAttachment po = attachmentDao.findById(Long.valueOf(idsArr[i])).get();
                 AttachmentVO vo = new AttachmentVO();
                 BeanMapper.copy(po, vo);
                 //if (vo != null) {
@@ -156,15 +127,67 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 根据整个文件的md5值查询附件表中是否存在该附件
      */
     @Override
-    public List<Attachment> getAttachmentByMd5(String wholeMd5) {
+    public List<SysAttachment> getAttachmentByMd5(String wholeMd5) {
         return attachmentDao.findByPersistedFileNameLike(wholeMd5);
     }
 
     @Override
-    public List<Attachment> findByFileMd5(String wholeMd5) {
+    public List<SysAttachment> findByFileMd5(String wholeMd5) {
         if (!StringUtil.isEmpty(wholeMd5)) {
             return attachmentDao.findByFileMd5(wholeMd5);
         } else
             return new ArrayList();
+    }
+
+    /**
+     * 初始化数据
+     *
+     * @param queryParamMap
+     */
+    @Override
+    public void initFile(Map<String, Object> queryParamMap) throws Exception {
+        String attachBasePath = bootdoConfig.getAttachBasePath();
+        File fileDir = new File(attachBasePath);
+        List<SysAttachment> attachmentList = new ArrayList<>();
+        regFile(fileDir, null);
+    }
+
+    /**
+     * 递归生成数据
+     *
+     * @param fileDir
+     * @param parent
+     * @throws Exception
+     */
+    private void regFile(File fileDir, SysAttachment parent) throws Exception {
+        if (fileDir.exists()) {
+            File[] listFiles = fileDir.listFiles();
+            for (File file : listFiles) {
+                boolean directory = file.isDirectory();
+                boolean hidden = file.isHidden();
+                if (!hidden) {
+                    String fullName = file.getName();
+                    String fileName = fullName;
+                    String prefix = "";
+                    if (fullName.indexOf(".") > 0) {
+                        prefix = fullName.substring(fullName.lastIndexOf(".") + 1);
+                        fileName = fullName.substring(0, fullName.lastIndexOf("."));
+                    }
+                    String canonicalPath = file.getCanonicalPath().replaceAll("\\\\", "/");
+                    SysAttachment sysAttachment = new SysAttachment();
+                    sysAttachment.setOriginalFullName(fullName);
+                    sysAttachment.setOriginalFileName(fileName);
+                    sysAttachment.setFileExt(prefix);
+                    sysAttachment.setIsDirectory(directory ? 1 : 0);
+                    sysAttachment.setPersistedFileName(canonicalPath);
+                    sysAttachment.setParentId(parent == null ? 0l : parent.getId());
+                    sysAttachment.setFileSize(directory ? null : file.length());
+                    sysAttachmentDao.save(sysAttachment);
+                    if (directory) {
+                        regFile(new File(canonicalPath), sysAttachment);
+                    }
+                }
+            }
+        }
     }
 }

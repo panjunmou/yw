@@ -1,6 +1,6 @@
 package com.bootdo.common.service;
 
-import com.bootdo.common.domain.Attachment;
+import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.vo.AttachmentVO;
 import com.bootdo.common.vo.FileVo;
 
@@ -21,7 +21,9 @@ public interface AttachmentService {
 
     List<AttachmentVO> findByIds(String ids) throws Exception;
 
-    List<Attachment> getAttachmentByMd5(String wholeMd5);
+    List<SysAttachment> getAttachmentByMd5(String wholeMd5);
 
-    List<Attachment> findByFileMd5(String wholeMd5);
+    List<SysAttachment> findByFileMd5(String wholeMd5);
+
+    void initFile(Map<String, Object> queryParamMap) throws Exception;
 }

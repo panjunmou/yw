@@ -1,7 +1,7 @@
 package com.bootdo.common.controller;
 
 import com.bootdo.common.config.BootdoConfig;
-import com.bootdo.common.domain.Attachment;
+import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.AttachmentService;
 import com.bootdo.common.utils.*;
 import com.bootdo.common.vo.AttachmentVO;
@@ -98,6 +98,26 @@ public class WebUploaderController extends BaseController {
     }
 
     /**
+     * 初始化数据
+     * @param request
+     * @return
+     */
+    @GetMapping("/initFile")
+    @ResponseBody
+    public ResultMessage initFile(HttpServletRequest request) {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        try {
+            attachmentService.initFile(queryParamMap);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            resultMessage.setResult(ResultMessage.Error);
+            resultMessage.setMessage("initFile Error");
+        }
+        return resultMessage;
+    }
+
+    /**
      * 根据wholeMd5验证系统中是否存在改文件
      * 如果存在，则在后台复制，以实现秒传
      *
@@ -111,21 +131,18 @@ public class WebUploaderController extends BaseController {
     public ResultMessage isExistWholeFile(String wholeMd5, String fileName, String ext) {
         logger.info(String.format("%20s md5:%s  fileName:%s", "isExistWholeFile", wholeMd5, fileName));
         ResultMessage mes = new ResultMessage();
-        List<Attachment> poList = attachmentService.findByFileMd5(wholeMd5);
+        List<SysAttachment> poList = attachmentService.findByFileMd5(wholeMd5);
         //数据库copy一份数据。
         if (CollectionUtils.isNotEmpty(poList)) {
-            Attachment po = poList.get(0);
+            SysAttachment po = poList.get(0);
             File f = new File(getFileStorePath(), po.getPersistedFileName());
             if (f.exists()) {
                 AttachmentVO newVO = new AttachmentVO();
                 BeanMapper.copy(po, newVO);
                 newVO.setId(null);
                 newVO.setCreateDate(new Date());
-                newVO.setDelFlag(0);
                 newVO.setFileExt(ext);
                 newVO.setOriginalFileName(fileName);
-                newVO.setOwner(ShiroUtils.getUser().getUsername());
-                newVO.setOwnerId(ShiroUtils.getUserId() + "");
                 Long newId = attachmentService.add(newVO);
                 newVO.setId(newId);
                 mes.setData(newVO);
@@ -152,7 +169,9 @@ public class WebUploaderController extends BaseController {
         Integer chunk = Integer.parseInt(request.getParameter("chunk")); //当前分片
         String wholeMd5 = request.getParameter("wholeMd5");//整个文件的md5值
         logger.info(String.format("%20s md5:%s  %s/%s", "checkSliceUploaded", wholeMd5, chunk + 1, chunksNum));
-        File chunkFile = new File(getChunkFilePath(wholeMd5), getChunkFileName(chunksNum, chunk, md5));
+        String chunkFilePath = getChunkFilePath(wholeMd5);
+        String chunkFileName = getChunkFileName(chunksNum, chunk, md5);
+        File chunkFile = new File(chunkFilePath, chunkFileName);
         if (chunkFile.exists()) {
             String serverMd5 = CommonUtils.getMd5ByFile(chunkFile);
             if (serverMd5 != null && serverMd5.equalsIgnoreCase(md5)) {
