@@ -148,7 +148,6 @@ public class AttachmentServiceImpl implements AttachmentService {
     public void initFile(Map<String, Object> queryParamMap) throws Exception {
         String attachBasePath = bootdoConfig.getAttachBasePath();
         File fileDir = new File(attachBasePath);
-        List<SysAttachment> attachmentList = new ArrayList<>();
         regFile(fileDir, null);
     }
 
@@ -179,9 +178,11 @@ public class AttachmentServiceImpl implements AttachmentService {
                     sysAttachment.setOriginalFileName(fileName);
                     sysAttachment.setFileExt(prefix);
                     sysAttachment.setIsDirectory(directory ? 1 : 0);
-                    sysAttachment.setPersistedFileName(canonicalPath);
+                    sysAttachment.setPersistedFileName(canonicalPath.replace(bootdoConfig.getAttachBasePath(),""));
                     sysAttachment.setParentId(parent == null ? 0l : parent.getId());
                     sysAttachment.setFileSize(directory ? null : file.length());
+                    sysAttachmentDao.save(sysAttachment);
+                    sysAttachment.setPath(parent == null ? sysAttachment.getId().toString() : (parent.getPath() + "." + sysAttachment.getId()));
                     sysAttachmentDao.save(sysAttachment);
                     if (directory) {
                         regFile(new File(canonicalPath), sysAttachment);

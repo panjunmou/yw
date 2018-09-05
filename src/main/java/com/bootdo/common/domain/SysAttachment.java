@@ -1,12 +1,7 @@
 package com.bootdo.common.domain;
 
-import ch.qos.logback.core.util.ContextUtil;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.system.domain.UserDO;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -70,7 +65,7 @@ public class SysAttachment implements Serializable {
     /**
      * 父节点
      */
-    @Column(name = "paretn_id")
+    @Column(name = "parent_id")
     private Long parentId;
 
     /**
@@ -78,6 +73,9 @@ public class SysAttachment implements Serializable {
      */
     @Column(name = "is_directory")
     private Integer isDirectory;
+
+    @Column(name = "path")
+    private String path;
 
     /**
      * 拥有者id
@@ -231,6 +229,14 @@ public class SysAttachment implements Serializable {
 
     public void setIsDirectory(Integer isDirectory) {
         this.isDirectory = isDirectory;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     /**
