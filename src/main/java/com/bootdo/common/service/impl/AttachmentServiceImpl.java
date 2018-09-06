@@ -42,9 +42,10 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return
      */
     @Override
-    public List<FileVo> listFlie(Map<String, Object> queryParamMap) throws Exception {
-
-        return null;
+    public List<SysAttachment> listFlie(Map<String, Object> queryParamMap) throws Exception {
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
+        List<SysAttachment> sysAttachmentList = attachmentDao.findByParentId(Long.parseLong(parentId));
+        return sysAttachmentList;
     }
 
     @Override

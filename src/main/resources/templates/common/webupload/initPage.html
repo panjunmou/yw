@@ -12,6 +12,7 @@
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 <body class="gray-bg">
+<!--
 <ol class="breadcrumb">
      <li th:each="file,pathStart:${pathList}" th:class="${pathStart.last} ? 'active'">
          <span th:if="${!pathStart.last}">
@@ -21,9 +22,10 @@
               <span href="#" th:text="${file.canonicalPath}"></span>
          </span>
      </li>
-    <!--<li class="active">Data</li>-->
+    <li class="active">Data</li>
 </ol>
-<button type="button" class="btn btn-primary">上传文件</button>
+-->
+<button type="button" class="btn btn-primary" onclick="upload()">上传文件</button>
 <div class="row" id="fileListDiv">
     <!--<div class="col-sm-6 col-md-4">
         <div class="thumbnail">
@@ -45,7 +47,7 @@
 <script src="/js/jquery.blockUI.js"></script>
 <script src="/js/ajaxExt.js"></script>
 <script src="/js/plugins/toastr/toastr.min.js"></script>
-
+<script src="/js/plugins/layer/layer.js"></script>
 <script type="text/javascript" th:inline="javascript">
     toastr.options = {
         closeButton: true,
@@ -53,29 +55,29 @@
         timeOut: "1300"
     };
     $(function () {
-        var path = [[${path}]];
+        // var path = [[${path}]];
+        var parentId = [[${parentId}]];
         $.ajaxExt({
             url: 'webupload/listFile',
             type: 'GET',
             data: {
-                path: path
+                parentId: parentId
             },
             success: function (result) {
                 if (result.result == 1) {
-                    var fileList = result.data;
-                    $.each(fileList, function (i, v) {
-                        if (!v.hidden) {
+                    var attachmentList = result.data;
+                    $.each(attachmentList, function (i, attachment) {
+                        if (!attachment.hidden) {
                             var fileStr =
                                 '<div class="col-sm-6 col-md-4">\n' +
                                 '        <div class="thumbnail">\n' +
                                 '            <img src="/img/a1.jpg" alt="提示">\n' +
                                 '            <div class="caption">\n' +
-                                '                <h3>' + v.fullName + '</h3>\n' +
+                                '                <h3>' + attachment.originalFullName + '</h3>\n' +
                                 '                <p>...</p>\n' +
                                 '                <p>\n';
-                            if (v.dictory) {
-                                var path = v.canonicalPath;
-                                fileStr += '<a href="#" class="btn btn-primary" role="button" id="' + v.id + '_open">打开</a>\n';
+                            if (attachment.isDirectory == 1) {
+                                fileStr += '<a href="#" class="btn btn-primary" role="button" id="' + attachment.id + '_open">打开</a>\n';
                             }
                             fileStr +=
                                 '                    <a href="#" class="btn btn-primary" role="button">下载</a>\n';
@@ -84,8 +86,8 @@
                             '        </div>\n' +
                             '    </div>';
                             $("#fileListDiv").append(fileStr);
-                            $("#" + v.id + '_open').on('click', function () {
-                                window.location.href = 'webupload?path=' + v.canonicalPath;
+                            $("#" + attachment.id + '_open').on('click', function () {
+                                window.location.href = 'webupload?parentId=' + attachment.id;
                             });
                         }
                     });
@@ -95,6 +97,18 @@
             }
         });
     });
+
+    function upload() {
+        layer.open({
+            type : 2,
+            title : '文件上传',
+            maxmin : false,
+            shadeClose : false, // 点击遮罩关闭层
+            closeBtn : 1,// 不显示右上角的关闭
+            area : [ '660px', '418px' ],
+            content : 'webupload/uploadPage'
+        });
+    }
 </script>
 </body>
 </html>

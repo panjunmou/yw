@@ -19,4 +19,6 @@ public interface SysAttachmentDao extends PagingAndSortingRepository<SysAttachme
     List<SysAttachment> findByFileMd5(String wholeMd5);
 
     List<SysAttachment> findByIdIn(Long[] ids);
+
+    List<SysAttachment> findByParentId(Long parentId);
 }

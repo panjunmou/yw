@@ -5,7 +5,6 @@ import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.AttachmentService;
 import com.bootdo.common.utils.*;
 import com.bootdo.common.vo.AttachmentVO;
-import com.bootdo.common.vo.FileVo;
 import com.bootdo.common.vo.ResultMessage;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangfei on 2016/6/8.
@@ -53,42 +54,46 @@ public class WebUploaderController extends BaseController {
     }
 
     /**
-     * 初始化
+     * 主页面
      *
      * @return
      * @throws Exception
      */
-    @GetMapping("")
+    @RequestMapping("")
     public String page(Model model, HttpServletRequest request) throws Exception {
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        String curPath = queryParamMap.get("path") == null ? "" : (String) queryParamMap.get("path");
-        model.addAttribute("path", curPath);
-        List<FileVo> pathList = new ArrayList<>();
-        FileVo mainFile = new FileVo();
-        mainFile.setFileName("主目录");
-        mainFile.setCanonicalPath(bootdoConfig.getAttachBasePath());
-        pathList.add(mainFile);
-        if (StringUtils.isNotEmpty(curPath)) {
-            String[] dir = curPath.replace(bootdoConfig.getAttachBasePath(), "").split("/");
-            for (String pathName : dir) {
-                FileVo fileVo = new FileVo();
-                fileVo.setFileName(pathName);
-
-                pathList.add(fileVo);
-            }
-        }
-        model.addAttribute("pathList", pathList);
+        String parentId = (String) queryParamMap.get("parentId");
+        model.addAttribute("parentId", parentId);
         return "common/webupload/initPage";
     }
 
-    @GetMapping("/listFile")
+    /**
+     * 文件上传页面
+     *
+     * @param model
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/uploadPage")
+    public String uploadPage(Model model, HttpServletRequest request) throws Exception {
+        return "common/webupload/uploadPage";
+    }
+
+    /**
+     * 查询数据
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping("/listFile")
     @ResponseBody
     public ResultMessage listFile(HttpServletRequest request) {
         ResultMessage resultMessage = new ResultMessage();
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         try {
-            List<FileVo> fileVoList = attachmentService.listFlie(queryParamMap);
-            resultMessage.setData(fileVoList);
+            List<SysAttachment> sysAttachmentList = attachmentService.listFlie(queryParamMap);
+            resultMessage.setData(sysAttachmentList);
         } catch (Exception e) {
             logger.error(e.getMessage());
             resultMessage.setResult(ResultMessage.Error);
@@ -99,12 +104,14 @@ public class WebUploaderController extends BaseController {
 
     /**
      * 初始化数据
+     *
      * @param request
      * @return
      */
-    @GetMapping("/initFile")
+    @RequestMapping("/initFile")
     @ResponseBody
     public ResultMessage initFile(HttpServletRequest request) {
+        System.out.println("WebUploaderController.initFile");
         ResultMessage resultMessage = new ResultMessage();
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         try {
@@ -126,9 +133,10 @@ public class WebUploaderController extends BaseController {
      * @param ext      文件扩展
      * @return
      */
-    @GetMapping("/isExistWholeFile")
+    @RequestMapping("/isExistWholeFile")
     @ResponseBody
     public ResultMessage isExistWholeFile(String wholeMd5, String fileName, String ext) {
+        System.out.println("WebUploaderController.isExistWholeFile");
         logger.info(String.format("%20s md5:%s  fileName:%s", "isExistWholeFile", wholeMd5, fileName));
         ResultMessage mes = new ResultMessage();
         List<SysAttachment> poList = attachmentService.findByFileMd5(wholeMd5);
@@ -160,9 +168,10 @@ public class WebUploaderController extends BaseController {
      * 分片验证
      * 根据分片文件内容的MD5
      */
-    @GetMapping("/checkUpload")
+    @RequestMapping("/checkUpload")
     @ResponseBody
     public ResultMessage checkUpload(HttpServletRequest request) throws Exception {
+        System.out.println("WebUploaderController.checkUpload");
         ResultMessage mes = new ResultMessage();
         String md5 = request.getParameter("md5");
         Integer chunksNum = Integer.parseInt(request.getParameter("chunks"));
@@ -190,6 +199,7 @@ public class WebUploaderController extends BaseController {
      * 获取分片路径
      */
     private String getChunkFilePath(String wholeMd5) {
+        System.out.println("WebUploaderController.getChunkFilePath");
         return getFileStorePath() + File.separator + "upload_files" + File.separator + "temp" + File.separator
                 + ShiroUtils.getUserId() + File.separator + wholeMd5;
 
@@ -199,16 +209,17 @@ public class WebUploaderController extends BaseController {
      * 获取分片名称
      */
     private String getChunkFileName(Integer chunksNum, Integer chunk, String md5) {
+        System.out.println("WebUploaderController.getChunkFileName");
         return chunksNum + "." + chunk + "." + md5;
     }
 
     /**
      * 文件分片上传请求
      */
-    @GetMapping("/upload")
+    @RequestMapping("/upload")
     @ResponseBody
     public ResultMessage upload(MultipartHttpServletRequest request, HttpServletResponse response) throws Exception {
-
+        System.out.println("WebUploaderController.upload");
         ResultMessage mes = new ResultMessage();
         MultipartFile file = request.getFile("file");
         String md5 = CommonUtils.getMd5ByFile(file);
@@ -237,9 +248,10 @@ public class WebUploaderController extends BaseController {
     /**
      * 文件分片上传合并
      */
-    @GetMapping("/fileMerge")
+    @RequestMapping("/fileMerge")
     @ResponseBody
     public ResultMessage fileMerge(HttpServletRequest request) throws Exception {
+        System.out.println("WebUploaderController.fileMerge");
         ResultMessage mes = new ResultMessage();
         final Integer chunks = Integer.parseInt(request.getParameter("chunks"));//分片总数
         String wholeMd5 = request.getParameter("wholeMd5");//整个文件的md5值
@@ -311,9 +323,10 @@ public class WebUploaderController extends BaseController {
     /**
      * 取消上传操作请求，删除上传的临时文件夹
      */
-    @GetMapping("/deleteTemp")
+    @RequestMapping("/deleteTemp")
     @ResponseBody
     public ResultMessage deleteTemp(HttpServletRequest request) throws Exception {
+        System.out.println("WebUploaderController.deleteTemp");
         ResultMessage mes = new ResultMessage();
         String wholeMd5 = request.getParameter("wholeMd5");//整个文件的md5值
         String fileName = request.getParameter("fileName");
@@ -331,9 +344,10 @@ public class WebUploaderController extends BaseController {
     /**
      * 下载附件
      */
-    @GetMapping("/download")
+    @RequestMapping("/download")
     @ResponseBody
     public void doDownloadFile(HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
+        System.out.println("WebUploaderController.doDownloadFile");
         CommonUtils.doDownloadFileDeal(getFileStorePath(), attachmentService, request, response, id);
     }
 }
