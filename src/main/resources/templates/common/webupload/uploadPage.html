@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>上传文件</title>
@@ -68,7 +68,8 @@
 <script type="text/javascript" src="/js/jquery.min.js?v=2.1.4"></script>
 <script type="text/javascript" src="/js/plugins/webuploader/webuploader.js"></script>
 <script type="text/javascript" src="/js/plugins/webuploader/YwWebUpload.js?t=2017122"></script>
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
+    var parentId = [[${parentId}]];
     $(function () {
         var options = {
             ctx: '/common',
@@ -77,7 +78,9 @@
                 parent.layer.close(index);
                 parent.addFiles(attachmentArray);
             },
-            formData: {},
+            formData: {
+                parentId: parentId
+            },
             onCancel: function () {
                 var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
                 parent.layer.close(index);

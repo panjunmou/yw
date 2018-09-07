@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 public class BootdoConfig {
 	//上传路径
 	private String uploadPath;
-	private String attachPath;
 	private String attachBasePath;
+	private String attachTempPath;
 
 	public String getUploadPath() {
 		return uploadPath;
@@ -19,19 +19,19 @@ public class BootdoConfig {
 		this.uploadPath = uploadPath;
 	}
 
-	public String getAttachPath() {
-		return attachPath;
-	}
-
-	public void setAttachPath(String attachPath) {
-		this.attachPath = attachPath;
-	}
-
 	public String getAttachBasePath() {
 		return attachBasePath;
 	}
 
 	public void setAttachBasePath(String attachBasePath) {
 		this.attachBasePath = attachBasePath;
+	}
+
+	public String getAttachTempPath() {
+		return attachTempPath;
+	}
+
+	public void setAttachTempPath(String attachTempPath) {
+		this.attachTempPath = attachTempPath;
 	}
 }

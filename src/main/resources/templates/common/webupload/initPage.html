@@ -54,9 +54,9 @@
         positionClass: "toast-center-center",
         timeOut: "1300"
     };
+    var parentId = [[${parentId}]];
     $(function () {
         // var path = [[${path}]];
-        var parentId = [[${parentId}]];
         $.ajaxExt({
             url: 'webupload/listFile',
             type: 'GET',
@@ -100,13 +100,13 @@
 
     function upload() {
         layer.open({
-            type : 2,
-            title : '文件上传',
-            maxmin : false,
-            shadeClose : false, // 点击遮罩关闭层
-            closeBtn : 1,// 不显示右上角的关闭
-            area : [ '660px', '418px' ],
-            content : 'webupload/uploadPage'
+            type: 2,
+            title: '文件上传',
+            maxmin: false,
+            shadeClose: false, // 点击遮罩关闭层
+            closeBtn: 1,// 不显示右上角的关闭
+            area: ['660px', '418px'],
+            content: 'webupload/uploadPage?parentId=' + parentId
         });
     }
 </script>

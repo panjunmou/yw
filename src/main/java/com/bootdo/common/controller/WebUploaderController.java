@@ -6,7 +6,6 @@ import com.bootdo.common.service.AttachmentService;
 import com.bootdo.common.utils.*;
 import com.bootdo.common.vo.AttachmentVO;
 import com.bootdo.common.vo.ResultMessage;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class WebUploaderController extends BaseController {
      * 获取文件存储路径
      */
     private String getFileStorePath() {
-        return bootdoConfig.getAttachPath() == null ? "../att_path" : bootdoConfig.getAttachPath();
+        return bootdoConfig.getAttachTempPath();
     }
 
     /**
@@ -77,6 +76,9 @@ public class WebUploaderController extends BaseController {
      */
     @RequestMapping("/uploadPage")
     public String uploadPage(Model model, HttpServletRequest request) throws Exception {
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        String parentId = (String) queryParamMap.get("parentId");
+        model.addAttribute("parentId", parentId);
         return "common/webupload/uploadPage";
     }
 
@@ -139,8 +141,8 @@ public class WebUploaderController extends BaseController {
         System.out.println("WebUploaderController.isExistWholeFile");
         logger.info(String.format("%20s md5:%s  fileName:%s", "isExistWholeFile", wholeMd5, fileName));
         ResultMessage mes = new ResultMessage();
-        List<SysAttachment> poList = attachmentService.findByFileMd5(wholeMd5);
         //数据库copy一份数据。
+        /*List<SysAttachment> poList = attachmentService.findByFileMd5(wholeMd5);
         if (CollectionUtils.isNotEmpty(poList)) {
             SysAttachment po = poList.get(0);
             File f = new File(getFileStorePath(), po.getPersistedFileName());
@@ -157,7 +159,7 @@ public class WebUploaderController extends BaseController {
                 mes.setResult(1);
                 return mes;
             }
-        }
+        }*/
         mes.setData(null);
         mes.setResult(0);
         return mes;
@@ -220,6 +222,7 @@ public class WebUploaderController extends BaseController {
     @ResponseBody
     public ResultMessage upload(MultipartHttpServletRequest request, HttpServletResponse response) throws Exception {
         System.out.println("WebUploaderController.upload");
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         ResultMessage mes = new ResultMessage();
         MultipartFile file = request.getFile("file");
         String md5 = CommonUtils.getMd5ByFile(file);
@@ -238,9 +241,9 @@ public class WebUploaderController extends BaseController {
         String wholeMd5 = request.getParameter("wholeMd5");
 
         String chunkFileName = getChunkFileName(chunksNum, chunk, md5);
+
         File f = new File(getChunkFilePath(wholeMd5), chunkFileName);
         logger.info(String.format("%20s md5:%s  %s/%s to %s", "upload", wholeMd5, chunk + 1, chunksNum, f.getAbsolutePath()));
-
         FileUtils.writeByteArrayToFile(f, file.getBytes());
         return mes;
     }
@@ -348,6 +351,6 @@ public class WebUploaderController extends BaseController {
     @ResponseBody
     public void doDownloadFile(HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
         System.out.println("WebUploaderController.doDownloadFile");
-        CommonUtils.doDownloadFileDeal(getFileStorePath(), attachmentService, request, response, id);
+//        CommonUtils.doDownloadFileDeal(getFileStorePath(), attachmentService, request, response, id);
     }
 }
