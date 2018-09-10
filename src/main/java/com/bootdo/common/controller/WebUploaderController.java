@@ -222,9 +222,10 @@ public class WebUploaderController extends BaseController {
     @ResponseBody
     public ResultMessage upload(MultipartHttpServletRequest request, HttpServletResponse response) throws Exception {
         System.out.println("WebUploaderController.upload");
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+
         ResultMessage mes = new ResultMessage();
         MultipartFile file = request.getFile("file");
+        String fileName = file.getName();
         String md5 = CommonUtils.getMd5ByFile(file);
         //断点续传检查
         //分片总数
@@ -239,11 +240,13 @@ public class WebUploaderController extends BaseController {
         }
         //整个文件的md5值
         String wholeMd5 = request.getParameter("wholeMd5");
-
         String chunkFileName = getChunkFileName(chunksNum, chunk, md5);
+        String chunkFilePath = getChunkFilePath(wholeMd5);
 
-        File f = new File(getChunkFilePath(wholeMd5), chunkFileName);
+        File f = new File(chunkFilePath, chunkFileName);
+
         logger.info(String.format("%20s md5:%s  %s/%s to %s", "upload", wholeMd5, chunk + 1, chunksNum, f.getAbsolutePath()));
+
         FileUtils.writeByteArrayToFile(f, file.getBytes());
         return mes;
     }
@@ -255,19 +258,26 @@ public class WebUploaderController extends BaseController {
     @ResponseBody
     public ResultMessage fileMerge(HttpServletRequest request) throws Exception {
         System.out.println("WebUploaderController.fileMerge");
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
+        AttachmentVO parentAtt = attachmentService.getById(Long.parseLong(parentId));
+        String persistedFileName = parentAtt.getPersistedFileName();
+        String path = bootdoConfig.getAttachBasePath() + persistedFileName;
+
         ResultMessage mes = new ResultMessage();
         final Integer chunks = Integer.parseInt(request.getParameter("chunks"));//分片总数
         String wholeMd5 = request.getParameter("wholeMd5");//整个文件的md5值
         String extName = request.getParameter("ext");//文件扩展名
         String originalFileName = request.getParameter("originalFileName");
-        String newPath = CommonUtils.createFilePath(
+        //合并完成后移动到新文件夹，并删除临时文件夹
+        /*String newPath = CommonUtils.createFilePath(
                 getFileStorePath() + File.separator + "upload_files" + File.separator + ShiroUtils.getUserId(),
-                wholeMd5 + "_" + DateUtils.format(new Date(), "HHmmss") + "." + extName); //合并完成后移动到新文件夹，并删除临时文件夹
+                wholeMd5 + "_" + DateUtils.format(new Date(), "HHmmss") + "." + extName);*/
+        String newPath = path + File.separator + originalFileName;
         String md5FilePath = getChunkFilePath(wholeMd5);
         logger.info(String.format("%20s md5:%s  fileName:%s from %s to %s", "fileMerge", wholeMd5, originalFileName, md5FilePath, newPath));
 
         File[] fileList = new File(md5FilePath).listFiles(new FilenameFilter() {
-
             @Override
             public boolean accept(File dir, String name) {
                 return name.startsWith("" + chunks);
@@ -308,7 +318,7 @@ public class WebUploaderController extends BaseController {
             if (wholeMd5.equals(tempMD5)) {
                 File newFile = new File(newPath);
                 FileUtils.copyFile(tempFile, newFile);
-                AttachmentVO avo = attachmentService.addAttachment(newPath, getFileStorePath(), originalFileName, extName,
+                AttachmentVO avo = attachmentService.addAttachment(newPath, parentAtt, originalFileName, extName,
                         newFile.length(), wholeMd5); //更新附件存储路径
                 FileUtils.deleteDirectory(new File(getChunkFilePath(wholeMd5))); // 删除临时目录中的分片文件
                 mes.setData(avo);

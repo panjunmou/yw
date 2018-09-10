@@ -70,7 +70,6 @@ $.ywWebUpload = function (options) {
             }
             destroy();
         });
-
     }
 
     /**
@@ -113,7 +112,7 @@ $.ywWebUpload = function (options) {
             async: true,
             type: "post",
             dataType: "json",
-            url: cfg.fileMergeUrl,
+            url: cfg.fileMergeUrl,//fileMerge
             data: data,
             success: function (result) {
                 var $li = $('#' + file.id);
@@ -154,7 +153,7 @@ $.ywWebUpload = function (options) {
             $.ajax({
                 type: "POST",
                 dataType: "text/json",
-                url: cfg.checkUploadUrl,
+                url: cfg.checkUploadUrl,//checkUpload
                 data: data,
                 cache: false,
                 // timeout: 3000, //todo 超时的话，只能认为该分片未上传过
@@ -174,8 +173,12 @@ $.ywWebUpload = function (options) {
         return deferred.promise();
     }
 
+    /**
+     * 获取文件图标
+     * @param ext
+     * @returns {string}
+     */
     function getFileIcon(ext) {
-        console.log('getFileIcon');
         switch (ext.toLowerCase()) {
             case 'zip':
             case 'tar':
@@ -241,9 +244,10 @@ $.ywWebUpload = function (options) {
                 async: true,
                 type: "post",
                 dataType: "json",
-                url: cfg.checkWholeMd5Url,
+                url: cfg.checkWholeMd5Url,//isExistWholeFile
                 data: data,
                 success: function (result) {
+                    console.log(result);
                     if (result.result == 1)//存在，直接后台复制
                     {
                         setTimeout(function () {
@@ -271,8 +275,6 @@ $.ywWebUpload = function (options) {
                 }
             });
         });
-
-
     }
 
     /**
@@ -345,7 +347,6 @@ $.ywWebUpload = function (options) {
         });
     }
 
-
     /**
      * 文件暂停的时候
      * @param file
@@ -401,6 +402,7 @@ $.ywWebUpload = function (options) {
      * para:file: File对象
      */
     initPage();
+
     WebUploader.Uploader.register({
         'after-send-file': 'chunkUploadFinish',
         'before-send': 'preupload'
@@ -408,6 +410,7 @@ $.ywWebUpload = function (options) {
         chunkUploadFinish: chunkUploadFinish,
         preupload: preupload
     });
+
     var wuopts = {
         resize: false,// 不压缩image
         swf: options.ctx + '/js/webupload/Uploader.swf', // swf文件路径
@@ -423,10 +426,12 @@ $.ywWebUpload = function (options) {
         timeout: 5 * 60 * 1000,
         formData: {}//文件上传请求的参数表，每次发送都会发送此对象中的参数
     };
-    if (options.accept)//图片上传的
-    {
+
+    if (options.accept){
+        /*图片上传的*/
         wuopts.accept = options.accept;
     }
+
     uploader = WebUploader.create(wuopts);
     // 当有文件添加进来的时候
     uploader.on('fileQueued', fileQueued);

@@ -7,12 +7,12 @@ import com.bootdo.common.service.AttachmentService;
 import com.bootdo.common.utils.BeanMapper;
 import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.AttachmentVO;
-import com.bootdo.common.vo.FileVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,20 +49,33 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public AttachmentVO addAttachment(String newPath, String attachPath, String oriFileName, String extName, Long size, String md5) {
+    public AttachmentVO addAttachment(String newPath, AttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException {
         File f1 = new File(newPath);
-        File f2 = new File(attachPath);
+//        File f2 = new File(attachPath);
         AttachmentVO vo = new AttachmentVO();
-        vo.setOriginalFileName(oriFileName);
-        vo.setPersistedFileName(
-                f1.getAbsolutePath().replace(f2.getAbsolutePath() + File.separator, "").replaceAll("\\\\", "/"));
+        String fullName = f1.getName();
+        String fileName = fullName;
+        if (fullName.indexOf(".") > 0) {
+            fileName = fullName.substring(0, fullName.lastIndexOf("."));
+        }
+        boolean directory = f1.isDirectory();
+        vo.setOriginalFileName(fileName);
+        vo.setOriginalFullName(fullName);
+        String canonicalPath = f1.getCanonicalPath().replaceAll("\\\\", "/");
+        vo.setPersistedFileName(canonicalPath.replace(bootdoConfig.getAttachBasePath(),""));
         vo.setFileSize(size);
         vo.setCreateDate(new Date());
         vo.setFileExt(extName);
         vo.setFileMd5(md5);
+        vo.setIsDirectory(directory ? 1 : 0);
+
         SysAttachment attachment = new SysAttachment();
         BeanUtils.copyProperties(vo, attachment);
         attachment = attachmentDao.save(attachment);
+        attachment.setPath(parentAtt == null ? attachment.getId().toString() : (parentAtt.getPath() + "." + attachment.getId()));
+        attachment.setParentId(parentAtt == null ? 0l : parentAtt.getId());
+        attachment = attachmentDao.save(attachment);
+
         AttachmentVO rvo = new AttachmentVO();
         BeanUtils.copyProperties(attachment, rvo);
         return rvo;
