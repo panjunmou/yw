@@ -5,30 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bootdo - 文件管理器</title>
     <link rel="shortcut icon" href="favicon.ico">
-    <link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
-    <link href="/css/plugins/toastr/toastr.min.css" rel="stylesheet">
-    <link href="/css/plugins/bootstrap-treeview/bootstrap-treeview.css" rel="stylesheet">
-    <link href="/css/font-awesome.css?v=4.4.0" rel="stylesheet">
-    <link href="/css/animate.css" rel="stylesheet">
-    <link href="/css/style.css?v=4.1.0" rel="stylesheet">
+    <link rel="stylesheet" href="/css/bootstrap.min.css?v=3.3.6">
+    <link rel="stylesheet" href="/css/plugins/toastr/toastr.min.css">
+    <link rel="stylesheet" href="/css/plugins/bootstrap-treeview/bootstrap-treeview.css">
+    <link rel="stylesheet" href="/css/font-awesome.css?v=4.4.0">
+    <link rel="stylesheet" href="/css/animate.css">
+    <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+    <link rel="stylesheet" href="/css/attactment/attactment.css">
+
 </head>
 <body class="gray-bg">
 <div class="wrapper wrapper-content">
     <div class="row">
         <div class="col-sm-3">
-            <div class="ibox ibox-body">
-                <div class="ibox-title">
-                    <h5>选择文件</h5>
-                </div>
-                <div class="ibox-content">
-                    <!--<input onkeyup="searchOrgTree(this)" type="text" class="form-control"
-                           placeholder="please enter org name"/>-->
-                    <div id="orgTree"></div>
-                </div>
+            <div class="left-content">
+                <!--<input onkeyup="searchOrgTree(this)" type="text" class="form-control"
+                       placeholder="please enter org name"/>-->
+                <div id="orgTree" style="height: 470px;overflow-y :scroll;"></div>
             </div>
         </div>
-        <div class="col-sm-8">
-            asdfasf
+        <div class="col-sm-9">
+            <div id="right-content" class="right-content">
+                <div class="zuijinTop">
+                    <div style="margin-top: 12px">
+                        <button type="button" class="btn btn-info" onclick="">
+                            <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新建文件夹
+                        </button>&nbsp;&nbsp;
+                        <button type="button" class="btn btn-primary" onclick="">
+                            <i class="glyphicon glyphicon-upload" aria-hidden="true"></i> 上传文件
+                        </button>&nbsp;&nbsp;
+                        <button type="button" class="btn btn-info" onclick="">
+                            <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
+                        </button>&nbsp;&nbsp;
+                        <button type="button" class="btn btn-success" onclick="">
+                            <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
+                        </button>&nbsp;&nbsp;
+                        <button type="button" class="btn btn-warning" onclick="">
+                            <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
+                        </button>&nbsp;&nbsp;
+                        <button type="button" class="btn btn-danger" onclick="">
+                            <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> 删除
+                        </button>
+                    </div>
+                </div>
+                <div class="zuijinTitle cl">
+                    <img src="/img/attactment/select.png" data-all="no" class="z allIcon allSelect" alt="">
+                    <div class="z the">我的文档</div>
+                    <div class="z the">人事</div>
+                </div>
+                <div class="content cl" id="fileDiv"
+                     style="top:150px;height:380px;padding-left:2%;overflow-y:auto;pisition:relative;">
+                    <div class="box template" data-show="no">
+                        <img src="/img/attactment/wenjian.png" class="myIcon" alt="">
+                        <div>
+                            <p>合同管理合同管理合同管理合同管理</p>
+                            <input type="text" class="none">
+                        </div>
+                        <img src="/img/attactment/select.png" class="select" alt="">
+                    </div>
+                    <div class="box2 template" data-show="no">
+                        <img src="/img/attactment/icon1.png" class="myIcon" alt="">
+                        <div>
+                            <p>asdfasdfasdfasdfasdfasdfasdfasdfasdfasfasdf</p>
+                            <input type="text" class="none">
+                        </div>
+                        <img src="/img/attactment/select.png" class="select" alt="">
+                    </div>
+                    <div class="box2 template" data-show="no">
+                        <img src="/img/attactment/icon2.png" class="" alt="">
+                        <div>
+                            <p>商机产品信息导入模板 1111dfasdfsad.xlsx</p>
+                            <input type="text" class="none">
+                        </div>
+                        <img src="/img/attactment/select.png" class="select" alt="">
+                    </div>
+                    <!--<div class="box template" data-show="no">
+                        <img src="/img/attactment/wenjian.png" class="myIcon" alt="">
+                        <div>
+                            <p>合同管理合同管理合同管理合同管理</p>
+                            <input type="text" class="none">
+                        </div>
+                        <img src="/img/attactment/select.png" class="select" alt="">
+                    </div>-->
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -36,13 +96,13 @@
     <input type="hidden" name="keyWords" id="orgKeyWord"/>
 </form>
 <!-- 全局js -->
-<script src="/js/jquery.min.js?v=2.1.4"></script>
-<script src="/js/bootstrap.min.js?v=3.3.6"></script>
-<script src="/js/jquery.blockUI.js"></script>
-<script src="/js/ajaxExt.js"></script>
-<script src="/js/plugins/toastr/toastr.min.js"></script>
-<script src="/js/plugins/layer/layer.js"></script>
-<script src="/js/plugins/bootstrap-treeview/bootstrap-treeview.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js?v=2.1.4"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js?v=3.3.6"></script>
+<script type="text/javascript" src="/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/js/ajaxExt.js"></script>
+<script type="text/javascript" src="/js/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript" src="/js/plugins/layer/layer.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap-treeview/bootstrap-treeview.js"></script>
 <script type="text/javascript" th:inline="javascript">
     toastr.options = {
         closeButton: true,
@@ -53,7 +113,102 @@
     $(function () {
         //组织机构树
         initOrgTree();
+
+        loadFile(19453);
+
+        $(".allIcon").click(function () {
+            if ($(this).attr("data-all") == "yes") {
+                $(this).attr("src", "/img/attactment/select.png");
+                $(".select").attr("src", "/img/attactment/select.png");
+                $(this).attr("data-all", "no");
+                $(".template").attr("data-show", "no");
+                $(".template").removeClass("box2H");
+            } else {
+                $(this).attr("src", "/img/attactment/selectC.png");
+                $(".template").attr("data-show", "yes");
+                $(this).attr("data-all", "yes");
+                $(".template").addClass("box2H");
+                $(".select").attr("src", "/img/attactment/selectC.png");
+            }
+        });
+
     });
+
+    function loadFile(pId) {
+        $.ajaxExt({
+            url: 'webupload/listFile',
+            type: 'GET',
+            data: {
+                parentId: pId
+            },
+            success: function (result) {
+                if (result.result == 1) {
+                    var attachmentList = result.data;
+                    $.each(attachmentList, function (i, attachment) {
+                        var fileStr = "";
+
+                        if (attachment.isDirectory == 1) {
+                            fileStr +=
+                                '<div class="box template" data-show="no" id="' + attachment.id + '">\n';
+                            fileStr +=
+                                '    <img src="/img/attactment/wenjian.png" class="myIcon" alt="">\n';
+                        } else {
+                            fileStr +=
+                                '<div class="box2 template" data-show="no" id="' + attachment.id + '">\n';
+                            if (attachment.fileExt == 'xlsx' || attachment.fileExt == 'xls') {
+                                fileStr +=
+                                    '    <img src="/img/attactment/icon1.png" class="myIcon" alt="">\n';
+                            } else if (attachment.fileExt == 'docx' || attachment.fileExt == 'doc') {
+                                fileStr +=
+                                    '    <img src="/img/attactment/icon3.png" class="myIcon" alt="">\n';
+                            } else if (attachment.fileExt == 'pptx' || attachment.fileExt == 'ppt') {
+                                fileStr +=
+                                    '    <img src="/img/attactment/icon2.png" class="myIcon" alt="">\n';
+                            } else {
+                                fileStr +=
+                                    '    <img src="/img/a5.jpg" class="myIcon" alt="">\n';
+                            }
+                        }
+                        fileStr +=
+                            '<div>\n' +
+                            '<p>' + attachment.originalFullName + '</p>\n' +
+                            '<input type="text" class="none">\n' +
+                            '</div>\n' +
+                            '<img src="/img/attactment/select.png" class="select" alt="">\n' +
+                            '</div>';
+                        $("#fileDiv").append(fileStr);
+                    });
+                    bindMyClick();
+                } else {
+                    toastr.error(result.message);
+                }
+            }
+        });
+    }
+
+    function bindMyClick() {
+        $(".content .template").each(function () {
+            $(this).click(function () {
+                if ($(this).attr("data-show") == "yes") {
+                    $(this).removeClass(".box2C");
+                    $(this).removeClass(".box2H");
+                    $(this).find(".select").attr("src", "/img/attactment/select.png");
+                    $(this).attr("data-show", "no");
+                } else {
+                    $(this).addClass(".box2C");
+                    $(this).addClass(".box2H");
+                    $(this).find(".select").attr("src", "/img/attactment/selectC.png");
+                    $(this).attr("data-show", "yes");
+                    $(this).find(".select").show();
+                }
+            });
+            $(this).dblclick(function () {
+                var parentId = $(this).attr("id");
+                $(".template").remove();
+                loadFile(parentId);
+            });
+        });
+    }
 
     function initOrgTree() {
         $.ajaxExt({
@@ -106,5 +261,6 @@
         });
     }
 </script>
+
 </body>
 </html>
