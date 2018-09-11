@@ -3,8 +3,12 @@ package com.bootdo.common.controller;
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.AttachmentService;
-import com.bootdo.common.utils.*;
+import com.bootdo.common.utils.CommonUtils;
+import com.bootdo.common.utils.RequestUtil;
+import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.ResultMessage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -22,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +66,7 @@ public class WebUploaderController extends BaseController {
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         String parentId = (String) queryParamMap.get("parentId");
         model.addAttribute("parentId", parentId);
-        return "common/webupload/initPage";
+        return "common/webupload/initPage2";
     }
 
     /**
@@ -362,5 +365,37 @@ public class WebUploaderController extends BaseController {
     public void doDownloadFile(HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
         System.out.println("WebUploaderController.doDownloadFile");
 //        CommonUtils.doDownloadFileDeal(getFileStorePath(), attachmentService, request, response, id);
+    }
+
+    /**
+     * 获取文件树
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping({"getAttTree.do"})
+    @ResponseBody
+    public ResultMessage getAttTree(HttpServletRequest request) throws Exception {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        List<BootStrapTreeViewVo> list = attachmentService.getAttachmentTree(queryParamMap);
+        resultMessage.setData(list);
+        return resultMessage;
+    }
+
+    /**
+     * 获取文件树
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping({"getAttByParentId.do"})
+    @ResponseBody
+    public ResultMessage getAttByParentId(HttpServletRequest request) throws Exception {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        List<BootStrapTreeViewVo> list = attachmentService.getByParentId(queryParamMap);
+        resultMessage.setData(list);
+        return resultMessage;
     }
 }

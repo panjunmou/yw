@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bootdo - 文件管理器</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/css/plugins/bootstrap-treeview/bootstrap-treeview.css" rel="stylesheet">
+    <link href="/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/css/animate.css" rel="stylesheet">
+    <link href="/css/style.css?v=4.1.0" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="ibox ibox-body">
+                <div class="ibox-title">
+                    <h5>选择文件</h5>
+                </div>
+                <div class="ibox-content">
+                    <!--<input onkeyup="searchOrgTree(this)" type="text" class="form-control"
+                           placeholder="please enter org name"/>-->
+                    <div id="orgTree"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            asdfasf
+        </div>
+    </div>
+</div>
+<form id="AttSearchForm">
+    <input type="hidden" name="keyWords" id="orgKeyWord"/>
+</form>
+<!-- 全局js -->
+<script src="/js/jquery.min.js?v=2.1.4"></script>
+<script src="/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/js/jquery.blockUI.js"></script>
+<script src="/js/ajaxExt.js"></script>
+<script src="/js/plugins/toastr/toastr.min.js"></script>
+<script src="/js/plugins/layer/layer.js"></script>
+<script src="/js/plugins/bootstrap-treeview/bootstrap-treeview.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    toastr.options = {
+        closeButton: true,
+        positionClass: "toast-center-center",
+        timeOut: "1300"
+    };
+    var parentId = [[${parentId}]];
+    $(function () {
+        //组织机构树
+        initOrgTree();
+    });
+
+    function initOrgTree() {
+        $.ajaxExt({
+            url: "webupload/getAttTree.do",
+            data: {
+                containsFile: '0',//不包含文件
+                parentId: parentId
+            },
+            success: function (data) {
+                $('#orgTree').treeview(
+                    {
+                        data: data.data,
+                        loadingIcon: "glyphicon glyphicon-refresh",//懒加载过程中显示的沙漏字符图标
+                        lazyLoad: loadData
+                    }
+                );
+                $('#orgTree').treeview('search', [$("#orgKeyWord").val(), {
+                    ignoreCase: true,    // case insensitive
+                    exactMatch: false,   // like or equals
+                    revealResults: true // reveal matching nodes
+                }]);
+            }
+        });
+    }
+
+    function loadData(node, func) {
+        //这个技巧真高，即能得到节点数据，又能把节点下级的数据通过函数发回去
+        $.ajaxExt({
+            url: "webupload/getAttByParentId.do",
+            data: {
+                containsFile: '0',//不包含文件
+                parentId: node.id
+            },
+            success: function (data) {
+                //把新的下级节点数据发回到后端，这样明显优雅很多
+                func(data.data);
+            }
+        });
+    }
+
+    function upload() {
+        layer.open({
+            type: 2,
+            title: '文件上传',
+            maxmin: false,
+            shadeClose: false, // 点击遮罩关闭层
+            closeBtn: 1,// 不显示右上角的关闭
+            area: ['660px', '418px'],
+            content: 'webupload/uploadPage?parentId=' + parentId
+        });
+    }
+</script>
+</body>
+</html>

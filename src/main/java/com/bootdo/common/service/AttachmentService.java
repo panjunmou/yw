@@ -2,6 +2,7 @@ package com.bootdo.common.service;
 
 import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.BootStrapTreeViewVo;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,4 +26,8 @@ public interface AttachmentService {
     List<SysAttachment> findByFileMd5(String wholeMd5);
 
     void initFile(Map<String, Object> queryParamMap) throws Exception;
+
+    List<BootStrapTreeViewVo> getAttachmentTree(Map<String, Object> queryParamMap);
+
+    List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap);
 }

@@ -7,6 +7,8 @@ import com.bootdo.common.service.AttachmentService;
 import com.bootdo.common.utils.BeanMapper;
 import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.BootStrapTreeViewVo;
+import com.bootdo.common.vo.BootStrapTreeViewVoState;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +64,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         vo.setOriginalFileName(fileName);
         vo.setOriginalFullName(fullName);
         String canonicalPath = f1.getCanonicalPath().replaceAll("\\\\", "/");
-        vo.setPersistedFileName(canonicalPath.replace(bootdoConfig.getAttachBasePath(),""));
+        vo.setPersistedFileName(canonicalPath.replace(bootdoConfig.getAttachBasePath(), ""));
         vo.setFileSize(size);
         vo.setCreateDate(new Date());
         vo.setFileExt(extName);
@@ -192,7 +194,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                     sysAttachment.setOriginalFileName(fileName);
                     sysAttachment.setFileExt(prefix);
                     sysAttachment.setIsDirectory(directory ? 1 : 0);
-                    sysAttachment.setPersistedFileName(canonicalPath.replace(bootdoConfig.getAttachBasePath(),""));
+                    sysAttachment.setPersistedFileName(canonicalPath.replace(bootdoConfig.getAttachBasePath(), ""));
                     sysAttachment.setParentId(parent == null ? 0l : parent.getId());
                     sysAttachment.setFileSize(directory ? null : file.length());
                     sysAttachmentDao.save(sysAttachment);
@@ -204,5 +206,61 @@ public class AttachmentServiceImpl implements AttachmentService {
                 }
             }
         }
+    }
+
+    @Override
+    public List<BootStrapTreeViewVo> getAttachmentTree(Map<String, Object> queryParamMap) {
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
+        List<BootStrapTreeViewVo> list = getByParentId(queryParamMap);
+        if (parentId.equals("0")) {
+            BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
+            bootStrapTreeViewVo.setId("0");
+            bootStrapTreeViewVo.setText("上海尧伟建设");
+//        bootStrapTreeViewVo.setIcon("glyphicon glyphicon-folder-open");
+            BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
+            bootStrapTreeViewVo.setParentId(null);
+            state.setExpanded(true);
+            bootStrapTreeViewVo.setState(state);
+            list.add(bootStrapTreeViewVo);
+        }
+
+        List<BootStrapTreeViewVo> bootStrapTreeViewVos = BootStrapTreeViewVo.listToTree(list);
+        return bootStrapTreeViewVos;
+    }
+
+    @Override
+    public List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap) {
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
+        String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
+        List<SysAttachment> sysAttachmentList = attachmentDao.findByParentId(Long.parseLong(parentId));
+        List<BootStrapTreeViewVo> list = new ArrayList<BootStrapTreeViewVo>();
+        if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
+            for (int i = 0; i < sysAttachmentList.size(); i++) {
+                SysAttachment sysAttachment = sysAttachmentList.get(i);
+                Integer isDirectory = sysAttachment.getIsDirectory();
+                BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
+                bootStrapTreeViewVo.setId(sysAttachment.getId().toString());
+                bootStrapTreeViewVo.setText(sysAttachment.getOriginalFullName());
+                if (isDirectory == 1) {
+                    //是文件夹
+//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-folder-close");
+                    bootStrapTreeViewVo.setLazyLoad(true);
+                } else {
+//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-file");
+                    //是文件
+                    if(containsFile.equals("0")){
+                        //不要包含文件,跳过
+                        continue;
+                    }
+                    bootStrapTreeViewVo.setLazyLoad(false);
+                }
+                BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
+                bootStrapTreeViewVo.setParentId(sysAttachment.getParentId().toString());
+                state.setExpanded(false);
+                bootStrapTreeViewVo.setState(state);
+                list.add(bootStrapTreeViewVo);
+            }
+        }
+        return list;
     }
 }
