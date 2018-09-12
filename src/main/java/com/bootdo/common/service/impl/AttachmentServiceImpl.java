@@ -269,7 +269,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         sysAttachment.setOriginalFileName("主目录");
         sysAttachment.setId(0l);
         list.add(sysAttachment);
-        if (!StringUtil.isEmpty(parentId)) {
+        if (!StringUtil.isEmpty(parentId) && !parentId.equals("0")) {
             SysAttachment parent = attachmentDao.findById(Long.parseLong(parentId)).get();
             String path = parent.getPath();
             String[] split = path.split("\\.");

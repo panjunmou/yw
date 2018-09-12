@@ -31,7 +31,7 @@
                         <button type="button" class="btn btn-info" onclick="">
                             <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新建文件夹
                         </button>&nbsp;&nbsp;
-                        <button type="button" class="btn btn-primary" onclick="">
+                        <button type="button" class="btn btn-primary" onclick="upload()">
                             <i class="glyphicon glyphicon-upload" aria-hidden="true"></i> 上传文件
                         </button>&nbsp;&nbsp;
                         <button type="button" class="btn btn-info" onclick="">
@@ -92,12 +92,13 @@
         positionClass: "toast-center-center",
         timeOut: "1300"
     };
-    var parentId = [[${parentId}]];
+    // var parentId = [[${parentId}]];
+    var parentId;
     $(function () {
         //组织机构树
         initOrgTree();
 
-        loadFile(parentId);
+        loadFile();
 
         $(".allIcon").click(function () {
             if ($(this).attr("data-all") == "yes") {
@@ -118,6 +119,7 @@
     });
 
     function loadFile(pId) {
+        parentId = pId;
         $.ajaxExt({
             url: 'webupload/listFile',
             type: 'GET',
@@ -178,8 +180,7 @@
                 $("#breadcrumbNav li:last").addClass("active");
                 $("#breadcrumbNav li a").on("click", function () {
                     var parentId = $(this).attr("id");
-                    $(".template").remove();
-                    loadFile(parentId);
+                    reloadFile(parentId);
                 });
             }
         });
@@ -253,10 +254,9 @@
             });
             $(this).dblclick(function () {
                 var isDirectory = $(this).attr("isDirectory");
-                if(isDirectory == '1'){
+                if (isDirectory == '1') {
                     var parentId = $(this).attr("id");
-                    $(".template").remove();
-                    loadFile(parentId);
+                    reloadFile(parentId);
                 }
             });
         });
@@ -267,8 +267,7 @@
             url: "webupload/getAttTree",
             type: 'GET',
             data: {
-                containsFile: '0',//不包含文件
-                parentId: parentId
+                containsFile: '0'//不包含文件
             },
             success: function (data) {
                 $('#orgTree').treeview(
@@ -277,8 +276,7 @@
                         loadingIcon: "glyphicon glyphicon-refresh",//懒加载过程中显示的沙漏字符图标
                         lazyLoad: loadData,
                         onNodeSelected: function (event, data) {
-                            $(".template").remove();
-                            loadFile(data.id);
+                            reloadFile(data.id);
                         }
                     }
                 );
@@ -316,6 +314,11 @@
             area: ['660px', '418px'],
             content: 'webupload/uploadPage?parentId=' + parentId
         });
+    }
+
+    function reloadFile(pId) {
+        $(".template").remove();
+        loadFile(pId);
     }
 </script>
 
