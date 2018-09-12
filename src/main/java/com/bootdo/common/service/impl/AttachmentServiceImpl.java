@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by wangfei on 2016/4/25.
@@ -248,7 +245,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 } else {
 //                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-file");
                     //是文件
-                    if(containsFile.equals("0")){
+                    if (containsFile.equals("0")) {
                         //不要包含文件,跳过
                         continue;
                     }
@@ -260,6 +257,36 @@ public class AttachmentServiceImpl implements AttachmentService {
                 bootStrapTreeViewVo.setState(state);
                 list.add(bootStrapTreeViewVo);
             }
+        }
+        return list;
+    }
+
+    @Override
+    public List<SysAttachment> getNavList(Map<String, Object> queryParamMap) {
+        String parentId = (String) queryParamMap.get("parentId");
+        List<SysAttachment> list = new ArrayList<>();
+        SysAttachment sysAttachment = new SysAttachment();
+        sysAttachment.setOriginalFileName("主目录");
+        sysAttachment.setId(0l);
+        list.add(sysAttachment);
+        if (!StringUtil.isEmpty(parentId)) {
+            SysAttachment parent = attachmentDao.findById(Long.parseLong(parentId)).get();
+            String path = parent.getPath();
+            String[] split = path.split("\\.");
+            Long[] idList = new Long[split.length];
+            for (int i = 0; i < split.length; i++) {
+                String id = split[i];
+                idList[i] = Long.parseLong(id);
+            }
+            List<SysAttachment> attachmentList = attachmentDao.findByIdIn(idList);
+            Collections.sort(attachmentList, new Comparator<SysAttachment>() {
+                @Override
+                public int compare(SysAttachment o1, SysAttachment o2) {
+                    int i = o1.getPath().length() - o2.getPath().length();
+                    return i;
+                }
+            });
+            list.addAll(attachmentList);
         }
         return list;
     }

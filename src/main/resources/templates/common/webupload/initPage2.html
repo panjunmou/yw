@@ -50,35 +50,18 @@
                 </div>
                 <div class="zuijinTitle cl">
                     <img src="/img/attactment/select.png" data-all="no" class="z allIcon allSelect" alt="">
-                    <div class="z the">我的文档</div>
-                    <div class="z the">人事</div>
+                    <!--<div class="z the">我的文档</div>-->
+                    <!--<div class="z the">人事</div>-->
+                    <div class="z">
+                        <ol class="breadcrumb" id="breadcrumbNav">
+                            <!--<li><a href="#">Home</a></li>-->
+                            <!--<li><a href="#">Library</a></li>-->
+                            <!--<li class="active">Data</li>-->
+                        </ol>
+                    </div>
                 </div>
                 <div class="content cl" id="fileDiv"
                      style="top:150px;height:380px;padding-left:2%;overflow-y:auto;pisition:relative;">
-                    <div class="box template" data-show="no">
-                        <img src="/img/attactment/wenjian.png" class="myIcon" alt="">
-                        <div>
-                            <p>合同管理合同管理合同管理合同管理</p>
-                            <input type="text" class="none">
-                        </div>
-                        <img src="/img/attactment/select.png" class="select" alt="">
-                    </div>
-                    <div class="box2 template" data-show="no">
-                        <img src="/img/attactment/icon1.png" class="myIcon" alt="">
-                        <div>
-                            <p>asdfasdfasdfasdfasdfasdfasdfasdfasdfasfasdf</p>
-                            <input type="text" class="none">
-                        </div>
-                        <img src="/img/attactment/select.png" class="select" alt="">
-                    </div>
-                    <div class="box2 template" data-show="no">
-                        <img src="/img/attactment/icon2.png" class="" alt="">
-                        <div>
-                            <p>商机产品信息导入模板 1111dfasdfsad.xlsx</p>
-                            <input type="text" class="none">
-                        </div>
-                        <img src="/img/attactment/select.png" class="select" alt="">
-                    </div>
                     <!--<div class="box template" data-show="no">
                         <img src="/img/attactment/wenjian.png" class="myIcon" alt="">
                         <div>
@@ -114,7 +97,7 @@
         //组织机构树
         initOrgTree();
 
-        loadFile(19453);
+        loadFile(parentId);
 
         $(".allIcon").click(function () {
             if ($(this).attr("data-all") == "yes") {
@@ -142,37 +125,26 @@
                 parentId: pId
             },
             success: function (result) {
+                loadNavList(pId);
                 if (result.result == 1) {
                     var attachmentList = result.data;
                     $.each(attachmentList, function (i, attachment) {
                         var fileStr = "";
-
                         if (attachment.isDirectory == 1) {
                             fileStr +=
-                                '<div class="box template" data-show="no" id="' + attachment.id + '">\n';
+                                '<div class="box template" data-show="no" id="' + attachment.id + '" isDirectory="1">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/wenjian.png" class="myIcon" alt="">\n';
                         } else {
+                            var picStr = getPic(attachment.fileExt);
                             fileStr +=
-                                '<div class="box2 template" data-show="no" id="' + attachment.id + '">\n';
-                            if (attachment.fileExt == 'xlsx' || attachment.fileExt == 'xls') {
-                                fileStr +=
-                                    '    <img src="/img/attactment/icon1.png" class="myIcon" alt="">\n';
-                            } else if (attachment.fileExt == 'docx' || attachment.fileExt == 'doc') {
-                                fileStr +=
-                                    '    <img src="/img/attactment/icon3.png" class="myIcon" alt="">\n';
-                            } else if (attachment.fileExt == 'pptx' || attachment.fileExt == 'ppt') {
-                                fileStr +=
-                                    '    <img src="/img/attactment/icon2.png" class="myIcon" alt="">\n';
-                            } else {
-                                fileStr +=
-                                    '    <img src="/img/a5.jpg" class="myIcon" alt="">\n';
-                            }
+                                '<div class="box2 template" data-show="no" id="' + attachment.id + '" isDirectory="0">\n';
+                            fileStr +=
+                                '    <img src="/img/attactment/' + picStr + '" class="myIcon" alt="">\n';
                         }
                         fileStr +=
                             '<div>\n' +
                             '<p>' + attachment.originalFullName + '</p>\n' +
-                            '<input type="text" class="none">\n' +
                             '</div>\n' +
                             '<img src="/img/attactment/select.png" class="select" alt="">\n' +
                             '</div>';
@@ -184,6 +156,83 @@
                 }
             }
         });
+    }
+
+    function loadNavList(pId) {
+        $.ajaxExt({
+            url: 'webupload/getNavList',
+            type: 'GET',
+            data: {
+                parentId: pId
+            },
+            success: function (result) {
+                $("#breadcrumbNav li").remove();
+                var attachmentList = result.data;
+                $.each(attachmentList, function (i, attachment) {
+                    if (parseInt(i + 1) == attachmentList.length) {
+                        $("#breadcrumbNav").append('<li>' + attachment.originalFileName + '</li>');
+                    } else {
+                        $("#breadcrumbNav").append('<li><a href="javascript:void(0)" id="' + attachment.id + '">' + attachment.originalFileName + '</a></li>');
+                    }
+                });
+                $("#breadcrumbNav li:last").addClass("active");
+                $("#breadcrumbNav li a").on("click", function () {
+                    var parentId = $(this).attr("id");
+                    $(".template").remove();
+                    loadFile(parentId);
+                });
+            }
+        });
+    }
+
+    function getPic(fileExt) {
+        switch (fileExt.toLowerCase()) {
+            case 'zip':
+            case 'tar':
+            case 'rar':
+            case '7z':
+                return 'file_zip.png';
+            case 'txt':
+                return 'file_txt.png';
+            case 'sql':
+            case 'java':
+                return 'file_code.png';
+            case 'html':
+            case 'htm':
+                return 'file_txt.png';
+            case 'doc':
+            case 'docx':
+                return 'file_word.png';
+            case 'xlsx':
+            case 'xls':
+                return 'file_excel.png';
+            case 'jpg':
+            case 'gif':
+            case 'png':
+                return 'file_img.png';
+            case 'pdf':
+                return 'file_pdf.png';
+            case 'ppt':
+            case 'pptx':
+                return 'file_ppt.png';
+            case 'wmv':
+            case 'asf':
+            case 'asx':
+            case 'rm':
+            case 'rmb':
+            case 'mp4':
+            case '3gp':
+            case 'mov':
+            case 'm4v':
+            case 'avi':
+            case 'mkv':
+            case 'flv':
+                return 'file_video.png';
+            case 'mp3':
+                return 'file_music.png';
+            default:
+                return 'file_blank.png';
+        }
     }
 
     function bindMyClick() {
@@ -203,16 +252,20 @@
                 }
             });
             $(this).dblclick(function () {
-                var parentId = $(this).attr("id");
-                $(".template").remove();
-                loadFile(parentId);
+                var isDirectory = $(this).attr("isDirectory");
+                if(isDirectory == '1'){
+                    var parentId = $(this).attr("id");
+                    $(".template").remove();
+                    loadFile(parentId);
+                }
             });
         });
     }
 
     function initOrgTree() {
         $.ajaxExt({
-            url: "webupload/getAttTree.do",
+            url: "webupload/getAttTree",
+            type: 'GET',
             data: {
                 containsFile: '0',//不包含文件
                 parentId: parentId
@@ -222,7 +275,11 @@
                     {
                         data: data.data,
                         loadingIcon: "glyphicon glyphicon-refresh",//懒加载过程中显示的沙漏字符图标
-                        lazyLoad: loadData
+                        lazyLoad: loadData,
+                        onNodeSelected: function (event, data) {
+                            $(".template").remove();
+                            loadFile(data.id);
+                        }
                     }
                 );
                 $('#orgTree').treeview('search', [$("#orgKeyWord").val(), {
@@ -237,7 +294,7 @@
     function loadData(node, func) {
         //这个技巧真高，即能得到节点数据，又能把节点下级的数据通过函数发回去
         $.ajaxExt({
-            url: "webupload/getAttByParentId.do",
+            url: "webupload/getAttByParentId",
             data: {
                 containsFile: '0',//不包含文件
                 parentId: node.id

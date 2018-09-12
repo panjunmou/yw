@@ -30,4 +30,6 @@ public interface AttachmentService {
     List<BootStrapTreeViewVo> getAttachmentTree(Map<String, Object> queryParamMap);
 
     List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap);
+
+    List<SysAttachment> getNavList(Map<String, Object> queryParamMap);
 }

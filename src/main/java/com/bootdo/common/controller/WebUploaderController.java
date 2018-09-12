@@ -373,7 +373,7 @@ public class WebUploaderController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping({"getAttTree.do"})
+    @RequestMapping("/getAttTree")
     @ResponseBody
     public ResultMessage getAttTree(HttpServletRequest request) throws Exception {
         ResultMessage resultMessage = new ResultMessage();
@@ -389,12 +389,28 @@ public class WebUploaderController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping({"getAttByParentId.do"})
+    @RequestMapping("/getAttByParentId")
     @ResponseBody
     public ResultMessage getAttByParentId(HttpServletRequest request) throws Exception {
         ResultMessage resultMessage = new ResultMessage();
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         List<BootStrapTreeViewVo> list = attachmentService.getByParentId(queryParamMap);
+        resultMessage.setData(list);
+        return resultMessage;
+    }
+
+    /**
+     * 获取文件树
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/getNavList")
+    @ResponseBody
+    public ResultMessage getNavList(HttpServletRequest request) throws Exception {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        List<SysAttachment> list = attachmentService.getNavList(queryParamMap);
         resultMessage.setData(list);
         return resultMessage;
     }

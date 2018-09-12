@@ -1,4 +1,9 @@
-.left-content{
+.breadcrumb {
+    background-color: transparent;
+    border-left: 1px solid #ccc;
+    padding-left: 10px;
+}
+.left-content {
     background-color: #ffffff;
     color: inherit;
     padding: 15px 20px 20px 20px;
@@ -9,6 +14,7 @@
     border-style: solid solid none;
     border-width: 1px 0px;
 }
+
 .right-content {
     background: #ffffff;
     margin-left: -15px;
@@ -136,10 +142,6 @@
     overflow: hidden;
     text-align: center;
     background-color: transparent;
-}
-
-.allIcon {
-    cursor: pointer;
 }
 
 .box2 .myIcon {
@@ -313,6 +315,7 @@
     margin-top: 10px;
     margin-right: 10px;
 }
+
 .ok {
     cursor: pointer;
     width: 60px;
