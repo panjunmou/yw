@@ -21,4 +21,6 @@ public interface SysAttachmentDao extends PagingAndSortingRepository<SysAttachme
     List<SysAttachment> findByIdIn(Long[] ids);
 
     List<SysAttachment> findByParentId(Long parentId);
+
+    SysAttachment findByPersistedFileName(String persistedFileName);
 }

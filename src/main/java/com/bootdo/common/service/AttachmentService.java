@@ -32,4 +32,6 @@ public interface AttachmentService {
     List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap);
 
     List<SysAttachment> getNavList(Map<String, Object> queryParamMap);
+
+    SysAttachment getByPersistedFileName(String persistedFileName);
 }

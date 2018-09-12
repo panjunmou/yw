@@ -290,4 +290,10 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
         return list;
     }
+
+    @Override
+    public SysAttachment getByPersistedFileName(String persistedFileName) {
+        SysAttachment sysAttachment = attachmentDao.findByPersistedFileName(persistedFileName);
+        return sysAttachment;
+    }
 }

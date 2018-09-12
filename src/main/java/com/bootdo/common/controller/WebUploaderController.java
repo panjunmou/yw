@@ -3,10 +3,7 @@ package com.bootdo.common.controller;
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.AttachmentService;
-import com.bootdo.common.utils.CommonUtils;
-import com.bootdo.common.utils.RequestUtil;
-import com.bootdo.common.utils.ShiroUtils;
-import com.bootdo.common.utils.StringUtil;
+import com.bootdo.common.utils.*;
 import com.bootdo.common.vo.AttachmentVO;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.ResultMessage;
@@ -14,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -320,9 +318,18 @@ public class WebUploaderController extends BaseController {
             String tempMD5 = CommonUtils.getMd5ByFile(tempFile);
             if (wholeMd5.equals(tempMD5)) {
                 File newFile = new File(newPath);
+                AttachmentVO avo;
+                if (!newFile.exists()) {
+                    avo = attachmentService.addAttachment(newPath, parentAtt, originalFileName, extName,
+                            newFile.length(), wholeMd5); //更新附件存储路径
+                } else {
+                    String pFileName = newPath.replace(bootdoConfig.getAttachBasePath(),"").replaceAll("\\\\", "/");
+                    SysAttachment sysAttachment = attachmentService.getByPersistedFileName(pFileName);
+                    avo = new AttachmentVO();
+                    BeanUtils.copyProperties(sysAttachment,avo);
+                }
                 FileUtils.copyFile(tempFile, newFile);
-                AttachmentVO avo = attachmentService.addAttachment(newPath, parentAtt, originalFileName, extName,
-                        newFile.length(), wholeMd5); //更新附件存储路径
+
                 FileUtils.deleteDirectory(new File(getChunkFilePath(wholeMd5))); // 删除临时目录中的分片文件
                 mes.setData(avo);
             } else {

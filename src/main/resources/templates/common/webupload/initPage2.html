@@ -28,7 +28,7 @@
             <div id="right-content" class="right-content">
                 <div class="zuijinTop">
                     <div style="margin-top: 12px">
-                        <button type="button" class="btn btn-info" onclick="">
+                        <button type="button" class="btn btn-info" onclick="newDir()">
                             <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新建文件夹
                         </button>&nbsp;&nbsp;
                         <button type="button" class="btn btn-primary" onclick="upload()">
@@ -37,12 +37,12 @@
                         <button type="button" class="btn btn-info" onclick="">
                             <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
                         </button>&nbsp;&nbsp;
-                        <button type="button" class="btn btn-success" onclick="">
+                       <!-- <button type="button" class="btn btn-success" onclick="">
                             <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
                         </button>&nbsp;&nbsp;
                         <button type="button" class="btn btn-warning" onclick="">
                             <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
-                        </button>&nbsp;&nbsp;
+                        </button>&nbsp;&nbsp;-->
                         <button type="button" class="btn btn-danger" onclick="">
                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> 删除
                         </button>
@@ -314,6 +314,10 @@
             area: ['660px', '418px'],
             content: 'webupload/uploadPage?parentId=' + parentId
         });
+    }
+
+    function newDir() {
+
     }
 
     function reloadFile(pId) {
