@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public interface AttachmentService {
+public interface SysAttachmentService {
     List<SysAttachment> listFlie(Map<String, Object> queryParamMap) throws Exception;
 
     AttachmentVO addAttachment(String newPath, AttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException;

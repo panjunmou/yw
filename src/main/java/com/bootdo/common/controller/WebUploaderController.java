@@ -2,10 +2,12 @@ package com.bootdo.common.controller;
 
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.domain.SysAttachment;
-import com.bootdo.common.service.AttachmentService;
-import com.bootdo.common.utils.*;
+import com.bootdo.common.service.SysAttachmentService;
+import com.bootdo.common.utils.CommonUtils;
+import com.bootdo.common.utils.RequestUtil;
+import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.AttachmentVO;
-import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.ResultMessage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -13,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +42,7 @@ public class WebUploaderController extends BaseController {
     private static Logger logger = LoggerFactory.getLogger(WebUploaderController.class);
 
     @Resource
-    private AttachmentService attachmentService;
+    private SysAttachmentService attachmentService;
     @Resource
     private BootdoConfig bootdoConfig;
 
@@ -51,80 +51,6 @@ public class WebUploaderController extends BaseController {
      */
     private String getFileStorePath() {
         return bootdoConfig.getAttachTempPath();
-    }
-
-    /**
-     * 主页面
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("")
-    public String page(Model model, HttpServletRequest request) throws Exception {
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        String parentId = (String) queryParamMap.get("parentId");
-        model.addAttribute("parentId", parentId);
-        return "common/webupload/initPage2";
-    }
-
-    /**
-     * 文件上传页面
-     *
-     * @param model
-     * @param request
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/uploadPage")
-    public String uploadPage(Model model, HttpServletRequest request) throws Exception {
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        String parentId = (String) queryParamMap.get("parentId");
-        model.addAttribute("parentId", parentId);
-        return "common/webupload/uploadPage";
-    }
-
-    /**
-     * 查询数据
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/listFile")
-    @ResponseBody
-    public ResultMessage listFile(HttpServletRequest request) {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        try {
-            List<SysAttachment> sysAttachmentList = attachmentService.listFlie(queryParamMap);
-            resultMessage.setData(sysAttachmentList);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            resultMessage.setResult(ResultMessage.Error);
-            resultMessage.setMessage("listFile Error");
-        }
-        return resultMessage;
-    }
-
-    /**
-     * 初始化数据
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/initFile")
-    @ResponseBody
-    public ResultMessage initFile(HttpServletRequest request) {
-        System.out.println("WebUploaderController.initFile");
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        try {
-            attachmentService.initFile(queryParamMap);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            resultMessage.setResult(ResultMessage.Error);
-            resultMessage.setMessage("initFile Error");
-        }
-        return resultMessage;
     }
 
     /**
@@ -323,10 +249,10 @@ public class WebUploaderController extends BaseController {
                     avo = attachmentService.addAttachment(newPath, parentAtt, originalFileName, extName,
                             newFile.length(), wholeMd5); //更新附件存储路径
                 } else {
-                    String pFileName = newPath.replace(bootdoConfig.getAttachBasePath(),"").replaceAll("\\\\", "/");
+                    String pFileName = newPath.replace(bootdoConfig.getAttachBasePath(), "").replaceAll("\\\\", "/");
                     SysAttachment sysAttachment = attachmentService.getByPersistedFileName(pFileName);
                     avo = new AttachmentVO();
-                    BeanUtils.copyProperties(sysAttachment,avo);
+                    BeanUtils.copyProperties(sysAttachment, avo);
                 }
                 FileUtils.copyFile(tempFile, newFile);
 
@@ -372,53 +298,5 @@ public class WebUploaderController extends BaseController {
     public void doDownloadFile(HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
         System.out.println("WebUploaderController.doDownloadFile");
 //        CommonUtils.doDownloadFileDeal(getFileStorePath(), attachmentService, request, response, id);
-    }
-
-    /**
-     * 获取文件树
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/getAttTree")
-    @ResponseBody
-    public ResultMessage getAttTree(HttpServletRequest request) throws Exception {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        List<BootStrapTreeViewVo> list = attachmentService.getAttachmentTree(queryParamMap);
-        resultMessage.setData(list);
-        return resultMessage;
-    }
-
-    /**
-     * 获取文件树
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/getAttByParentId")
-    @ResponseBody
-    public ResultMessage getAttByParentId(HttpServletRequest request) throws Exception {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        List<BootStrapTreeViewVo> list = attachmentService.getByParentId(queryParamMap);
-        resultMessage.setData(list);
-        return resultMessage;
-    }
-
-    /**
-     * 获取文件树
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/getNavList")
-    @ResponseBody
-    public ResultMessage getNavList(HttpServletRequest request) throws Exception {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        List<SysAttachment> list = attachmentService.getNavList(queryParamMap);
-        resultMessage.setData(list);
-        return resultMessage;
     }
 }

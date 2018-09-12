@@ -1,6 +1,6 @@
 package com.bootdo.common.utils;
 
-import com.bootdo.common.service.AttachmentService;
+import com.bootdo.common.service.SysAttachmentService;
 import com.bootdo.common.vo.AttachmentVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +107,7 @@ public class CommonUtils {
     /**
      * 下载附件逻辑处理
      */
-    public static void doDownloadFileDeal(String fileStorePath, AttachmentService attachmentService,
+    public static void doDownloadFileDeal(String fileStorePath, SysAttachmentService attachmentService,
                                           HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
         long fileId = id;
         if (fileId != 0L) {

@@ -3,7 +3,7 @@ package com.bootdo.common.service.impl;
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.dao.SysAttachmentDao;
 import com.bootdo.common.domain.SysAttachment;
-import com.bootdo.common.service.AttachmentService;
+import com.bootdo.common.service.SysAttachmentService;
 import com.bootdo.common.utils.BeanMapper;
 import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.AttachmentVO;
@@ -22,7 +22,7 @@ import java.util.*;
  * 附件服务类
  */
 @Service
-public class AttachmentServiceImpl implements AttachmentService {
+public class SysAttachmentServiceImpl implements SysAttachmentService {
 
     /**
      * 附件dao
