@@ -46,7 +46,7 @@
         $('#roleTable').bootstrapTable(
             {
                 method: 'get', // 服务器数据的请求方式 get or post
-                url: "sys/user/list", // 服务器数据的加载地址
+                url: "/common/attachmentRole/list", // 服务器数据的加载地址
                 // showRefresh : true,
                 // showToggle : true,
                 // showColumns : true,
@@ -84,29 +84,76 @@
                         checkbox: true
                     },
                     {
-                        field: 'userId', // 列字段名
-                        title: '权限类型' // 列标题
+                        field: 'type',
+                        title: '权限类型',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter : function(value, row, index) {
+                            if (value == 'dept') {
+                                return '部门';
+                            } else {
+                                return '个人';
+                            }
+                        }
                     },
                     {
-                        field: 'name',
-                        title: '名称'
+                        field: 'relationName',
+                        title: '名称',
+                        align: 'center',
+                        valign: 'middle'
                     },
                     {
-                        field: 'username',
-                        title: '可见'
+                        field: 'canRead',
+                        title: '可见',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter : function(value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
                     },
                     {
-                        field: 'email',
-                        title: '上传'
+                        field: 'canUpload',
+                        title: '上传',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter : function(value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
                     },
                     {
-                        field: 'email',
-                        title: '下载'
+                        field: 'canDownload',
+                        title: '下载',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter : function(value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
                     },
                     {
-                        field: 'email',
-                        title: '删除'
-                    },
+                        field: 'canDel',
+                        title: '删除',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter : function(value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
+                    }
                 ]
             });
     });

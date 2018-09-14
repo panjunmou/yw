@@ -7,6 +7,7 @@ import com.bootdo.common.utils.Query;
 import com.bootdo.common.utils.R;
 import com.bootdo.common.utils.RequestUtil;
 import com.bootdo.common.vo.ResultMessage;
+import com.bootdo.common.vo.SysAttachmentRoleVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,7 +43,7 @@ public class SysAttachmentRoleController {
     public PageUtils list(@RequestParam Map<String, Object> params) {
         //查询列表数据
         Query query = new Query(params);
-        List<SysAttachmentRole> attachmentRoleList = attachmentRoleService.list(query);
+        List<SysAttachmentRoleVO> attachmentRoleList = attachmentRoleService.list(query);
         int total = attachmentRoleService.count(query);
         PageUtils pageUtils = new PageUtils(attachmentRoleList, total);
         return pageUtils;
