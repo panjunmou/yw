@@ -20,7 +20,7 @@
             <div class="left-content">
                 <!--<input onkeyup="searchOrgTree(this)" type="text" class="form-control"
                        placeholder="please enter org name"/>-->
-                <div id="orgTree" style="height: 470px;overflow-y :scroll;"></div>
+                <div id="orgTree" style="height: 540px;overflow-y :scroll;"></div>
             </div>
         </div>
         <div class="col-sm-9">
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 <div class="content cl" id="fileDiv"
-                     style="top:150px;height:380px;padding-left:2%;overflow-y:auto;pisition:relative;">
+                     style="top:150px;height:450px;padding-left:2%;overflow-y:auto;pisition:relative;">
                     <!--<div class="box template" data-show="no">
                         <img src="/img/attactment/wenjian.png" class="myIcon" alt="">
                         <div>
@@ -342,7 +342,8 @@
             maxmin: true,
             shadeClose: false, // 点击遮罩关闭层
             closeBtn: 1,// 不显示右上角的关闭
-            area: ['660px', '418px'],
+            // area: ['660px', '418px'],
+            area: ['80%', '80%'],
             content: 'attachmentRole?id=' + id
         });
     }

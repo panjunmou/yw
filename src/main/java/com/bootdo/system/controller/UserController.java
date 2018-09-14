@@ -57,6 +57,14 @@ public class UserController extends BaseController {
 		return pageUtil;
 	}
 
+	@RequestMapping("/listAll")
+	@ResponseBody
+	List<UserDO> listAll(HttpServletRequest request) {
+		Map<String, Object> params = RequestUtil.getParameterValueMap(request, false, false);
+		List<UserDO> sysUserList = userService.list(params);
+		return sysUserList;
+	}
+
 	@RequiresPermissions("sys:user:add")
 	@Log("添加用户")
 	@GetMapping("/add")

@@ -5,11 +5,14 @@ import com.bootdo.common.service.SysAttachmentRoleService;
 import com.bootdo.common.utils.PageUtils;
 import com.bootdo.common.utils.Query;
 import com.bootdo.common.utils.R;
+import com.bootdo.common.utils.RequestUtil;
+import com.bootdo.common.vo.ResultMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +30,10 @@ public class SysAttachmentRoleController {
     private SysAttachmentRoleService attachmentRoleService;
 
     @RequestMapping("")
-    String AttachmentRole() {
+    String AttachmentRole(HttpServletRequest request, Model model) {
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        String id = (String) queryParamMap.get("id");
+        model.addAttribute("id", id);
         return "common/attachmentRole/attachmentRole";
     }
 
@@ -43,7 +49,10 @@ public class SysAttachmentRoleController {
     }
 
     @RequestMapping("/add")
-    String add() {
+    String add(HttpServletRequest request, Model model) {
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        String id = (String) queryParamMap.get("id");
+        model.addAttribute("id", id);
         return "common/attachmentRole/add";
     }
 
@@ -58,12 +67,11 @@ public class SysAttachmentRoleController {
      * 保存
      */
     @ResponseBody
-    @PostMapping("/save")
-    public R save(SysAttachmentRole attachmentRole) {
-        if (attachmentRoleService.save(attachmentRole) > 0) {
-            return R.ok();
-        }
-        return R.error();
+    @RequestMapping("/save")
+    public ResultMessage save(SysAttachmentRole attachmentRole) {
+        ResultMessage resultMessage = new ResultMessage();
+        attachmentRoleService.save(attachmentRole);
+        return resultMessage;
     }
 
     /**

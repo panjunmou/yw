@@ -22,7 +22,7 @@ public class SysAttachmentRole extends AuditableBaseEntity {
     private Long relationId;
 
     @Column(name = "type")
-    private Integer type;
+    private String type;
 
     @Column(name = "can_read")
     private Integer canRead;
@@ -52,11 +52,11 @@ public class SysAttachmentRole extends AuditableBaseEntity {
         this.relationId = relationId;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 

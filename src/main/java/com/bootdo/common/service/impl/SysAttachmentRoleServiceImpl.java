@@ -1,11 +1,13 @@
 package com.bootdo.common.service.impl;
 
+import com.bootdo.common.dao.SysAttachmentRoleDao;
 import com.bootdo.common.dao.SysAttachmentRoleMapper;
 import com.bootdo.common.domain.SysAttachmentRole;
 import com.bootdo.common.service.SysAttachmentRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +17,8 @@ public class SysAttachmentRoleServiceImpl implements SysAttachmentRoleService {
 
     @Autowired
     private SysAttachmentRoleMapper sysAttachmentRoleMapper;
+    @Resource
+    private SysAttachmentRoleDao sysAttachmentRoleDao;
 
     @Override
     public SysAttachmentRole get(Long id) {
@@ -32,8 +36,9 @@ public class SysAttachmentRoleServiceImpl implements SysAttachmentRoleService {
     }
 
     @Override
-    public int save(SysAttachmentRole attachmentRole) {
-        return sysAttachmentRoleMapper.save(attachmentRole);
+    public SysAttachmentRole save(SysAttachmentRole attachmentRole) {
+        SysAttachmentRole sysAttachmentRole = sysAttachmentRoleDao.save(attachmentRole);
+        return sysAttachmentRole;
     }
 
     @Override

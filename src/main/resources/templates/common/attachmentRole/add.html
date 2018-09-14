@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="/css/bootstrap.min.css?v=3.3.6">
+    <link rel="stylesheet" href="/css/plugins/toastr/toastr.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.css?v=4.4.0">
+    <link rel="stylesheet" href="/css/animate.css">
+    <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+    <link rel="stylesheet" href="/css/plugins/bootstrap-select/bootstrap-select.css">
+    <link rel="stylesheet" href="/css/plugins/bootstrap-iCheck/skins/flat/green.css">
+</head>
+<body class="gray-bg">
+<div class="container" style="width: 95%;">
+    <div class="row">
+        <form class="form-horizontal" id="roleForm" style="padding: 5px;">
+            <input type="hidden" name="relationId"/>
+            <input type="hidden" name="attactmentId" th:value="${id}"/>
+            <div class="form-group">
+                <label for="type" class="col-sm-2 control-label">权限类型:</label>
+                <div class="col-sm-10">
+                    <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="false"
+                            name="type" id="type" data-dropup-auto="false">
+                        <option value="dept">部门</option>
+                        <option value="person">个人</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" id="deptDiv" style="display: none;">
+                <label for="dept" class="col-sm-2 control-label">选择部门:</label>
+                <div class="col-sm-10">
+                    <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
+                            name="dept" id="dept" data-dropup-auto="false">
+                        <option value="">请选择...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" id="personDiv" style="display: none;">
+                <label for="person" class="col-sm-2 control-label">选择人员:</label>
+                <div class="col-sm-10">
+                    <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
+                            name="person" id="person" data-dropup-auto="false">
+                        <option value="">请选择...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">可见:</label>
+                <div class="col-sm-10">
+                    <input type="radio" name="canRead" value="1" checked> 是&nbsp;&nbsp;
+                    <input type="radio" name="canRead" value="-1"> 否
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">上传:</label>
+                <div class="col-sm-10">
+                    <input type="radio" name="canUpload" value="1"> 是&nbsp;&nbsp;
+                    <input type="radio" name="canUpload" value="-1" checked> 否
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">下载:</label>
+                <div class="col-sm-10">
+                    <input type="radio" name="canDownload" value="1"> 是&nbsp;&nbsp;
+                    <input type="radio" name="canDownload" value="-1" checked> 否
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">删除:</label>
+                <div class="col-sm-10">
+                    <input type="radio" name="canDel" value="1"> 是&nbsp;&nbsp;
+                    <input type="radio" name="canDel" value="-1" checked> 否
+                </div>
+            </div>
+        </form>
+        <div class="text-center">
+            <button type="button" class="btn btn-info" onclick="saveRole()">保存</button>&nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default" onclick="closeRole()">关闭</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/js/jquery.min.js?v=2.1.4"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js?v=3.3.6"></script>
+<script type="text/javascript" src="/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/js/ajaxExt.js"></script>
+<script type="text/javascript" src="/js/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap-select/bootstrap-select.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap-select/i18n/defaults-zh_CN.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap-iCheck/icheck.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery.serializeObject.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    $(function () {
+        loadPerson();
+        loadDept();
+
+        $('input[type="radio"]').iCheck({
+            checkboxClass: 'icheckbox_flat-green',
+            radioClass: 'iradio_flat-green',
+            increaseArea: '20%'
+        });
+
+        typeChange('dept');
+        $("#type").change(function () {
+            typeChange($(this).val());
+        });
+
+        $("#dept").change(function () {
+            $("[name='relationId']").val($(this).val());
+        });
+        $("#person").change(function () {
+            $("[name='relationId']").val($(this).val());
+        });
+    });
+
+    function typeChange(val) {
+        if (val == 'dept') {
+            $("#deptDiv").show();
+            $("#personDiv").hide();
+        } else {
+            $("#deptDiv").hide();
+            $("#personDiv").show();
+        }
+    }
+
+    function loadPerson() {
+        $.ajaxExt({
+            url: "/sys/user/listAll",
+            data: {},
+            success: function (data) {
+                $.each(data, function (i, v) {
+                    $("#person").append("<option value=" + v.userId + ">" + v.name + "</option>");
+                });
+                $('#person').selectpicker('refresh');
+            }
+        });
+    }
+
+    function loadDept() {
+        $.ajaxExt({
+            url: "/system/sysDept/listAll",
+            data: {},
+            success: function (data) {
+                $.each(data, function (i, v) {
+                    $("#dept").append("<option value=" + v.deptId + ">" + v.name + "</option>");
+                });
+                $('#dept').selectpicker('refresh');
+            }
+        });
+    }
+
+    function saveRole() {
+        var roleData = $("#roleForm").serializeObject();
+        $.ajaxExt({
+            url: "/common/attachmentRole/save",
+            data: roleData,
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+    function closeRole() {
+        var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+        parent.layer.close(index);
+    }
+
+</script>
+</body>
+</html>
