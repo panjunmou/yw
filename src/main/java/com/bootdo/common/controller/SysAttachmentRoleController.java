@@ -69,9 +69,10 @@ public class SysAttachmentRoleController {
      */
     @ResponseBody
     @RequestMapping("/save")
-    public ResultMessage save(SysAttachmentRole attachmentRole) {
+    public ResultMessage save(HttpServletRequest request) {
         ResultMessage resultMessage = new ResultMessage();
-        attachmentRoleService.save(attachmentRole);
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        attachmentRoleService.save(paraMap);
         return resultMessage;
     }
 

@@ -17,8 +17,9 @@
     <div class="row">
         <form class="form-horizontal" id="roleForm" style="padding: 5px;">
             <input type="hidden" name="relationId"/>
+            <input type="hidden" name="type" value="person"/>
             <input type="hidden" name="attactmentId" th:value="${id}"/>
-            <div class="form-group">
+            <!--<div class="form-group">
                 <label for="type" class="col-sm-2 control-label">权限类型:</label>
                 <div class="col-sm-10">
                     <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="false"
@@ -27,17 +28,17 @@
                         <option value="person">个人</option>
                     </select>
                 </div>
-            </div>
-            <div class="form-group" id="deptDiv" style="display: none;">
-                <label for="dept" class="col-sm-2 control-label">选择部门:</label>
-                <div class="col-sm-10">
-                    <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
-                            name="dept" id="dept" data-dropup-auto="false">
-                        <option value="">请选择...</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group" id="personDiv" style="display: none;">
+            </div>-->
+            <!-- <div class="form-group" id="deptDiv" style="display: none;">
+                 <label for="dept" class="col-sm-2 control-label">选择部门:</label>
+                 <div class="col-sm-10">
+                     <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
+                             name="dept" id="dept" data-dropup-auto="false">
+                         <option value="">请选择...</option>
+                     </select>
+                 </div>
+             </div>-->
+            <div class="form-group" id="personDiv">
                 <label for="person" class="col-sm-2 control-label">选择人员:</label>
                 <div class="col-sm-10">
                     <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
@@ -47,31 +48,55 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-2 control-label">可见:</label>
+                <label class="col-sm-2 control-label">权限:</label>
                 <div class="col-sm-10">
-                    <input type="radio" name="canRead" value="1" checked> 是&nbsp;&nbsp;
-                    <input type="radio" name="canRead" value="-1"> 否
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-2 control-label">上传:</label>
-                <div class="col-sm-10">
-                    <input type="radio" name="canUpload" value="1"> 是&nbsp;&nbsp;
-                    <input type="radio" name="canUpload" value="-1" checked> 否
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-2 control-label">下载:</label>
-                <div class="col-sm-10">
-                    <input type="radio" name="canDownload" value="1"> 是&nbsp;&nbsp;
-                    <input type="radio" name="canDownload" value="-1" checked> 否
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-2 control-label">删除:</label>
-                <div class="col-sm-10">
-                    <input type="radio" name="canDel" value="1"> 是&nbsp;&nbsp;
-                    <input type="radio" name="canDel" value="-1" checked> 否
+                    <div class="row" style="margin-left: 2px">
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="view"/> 查看
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="down"/> 下载
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="move"/> 移动
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-left: 2px">
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="copy"/> 复制
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="del"/> 删除
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="reName"/> 重命名
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="row" style="margin-left: 2px">
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="upload"/> 上传
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" value="mkDir"/> 创建文件夹
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
@@ -94,18 +119,24 @@
 <script type="text/javascript" th:inline="javascript">
     $(function () {
         loadPerson();
-        loadDept();
+        // loadDept();
+        /*
+                $('input[type="radio"]').iCheck({
+                    checkboxClass: 'icheckbox_flat-green',
+                    radioClass: 'iradio_flat-green',
+                    increaseArea: '20%'
+                });*/
 
-        $('input[type="radio"]').iCheck({
+        $('input[type="checkbox"]').iCheck({
             checkboxClass: 'icheckbox_flat-green',
             radioClass: 'iradio_flat-green',
             increaseArea: '20%'
         });
 
-        typeChange('dept');
+        /*typeChange('dept');
         $("#type").change(function () {
             typeChange($(this).val());
-        });
+        });*/
 
         $("#dept").change(function () {
             $("[name='relationId']").val($(this).val());

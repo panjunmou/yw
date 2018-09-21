@@ -24,6 +24,9 @@ public class SysAttachmentRole extends AuditableBaseEntity {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "permission")
+    private String permission;
+
     @Column(name = "can_read")
     private Integer canRead;
 
@@ -35,6 +38,14 @@ public class SysAttachmentRole extends AuditableBaseEntity {
 
     @Column(name = "can_download")
     private Integer canDownload;
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
 
     public Long getAttactmentId() {
         return attactmentId;

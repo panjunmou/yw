@@ -19,7 +19,7 @@ public interface SysAttachmentRoleService {
 
     int count(Map<String, Object> map);
 
-    SysAttachmentRole save(SysAttachmentRole sysAttachmentRole);
+    SysAttachmentRole save(Map<String, Object> paraMap);
 
     int update(SysAttachmentRole sysAttachmentRole);
 

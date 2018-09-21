@@ -1,9 +1,13 @@
 package com.bootdo.common.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.bootdo.common.dao.SysAttachmentRoleDao;
 import com.bootdo.common.dao.SysAttachmentRoleMapper;
 import com.bootdo.common.domain.SysAttachmentRole;
 import com.bootdo.common.service.SysAttachmentRoleService;
+import com.bootdo.common.utils.StringUtils;
 import com.bootdo.common.vo.SysAttachmentRoleVO;
 import com.bootdo.system.dao.DeptDao;
 import com.bootdo.system.dao.UserDao;
@@ -66,9 +70,15 @@ public class SysAttachmentRoleServiceImpl implements SysAttachmentRoleService {
     }
 
     @Override
-    public SysAttachmentRole save(SysAttachmentRole attachmentRole) {
-        SysAttachmentRole sysAttachmentRole = sysAttachmentRoleDao.save(attachmentRole);
-        return sysAttachmentRole;
+    public SysAttachmentRole save(Map<String, Object> paraMap) {
+        String jsonString = JSON.toJSONString(paraMap);
+        SysAttachmentRole sysAttachmentRole = JSON.parseObject(jsonString, SysAttachmentRole.class);
+        JSONObject jsonObject = JSON.parseObject(jsonString);
+        String permissionStr = (String) jsonObject.get("permission[]");
+        if (!StringUtils.isEmpty(permissionStr)) {
+            sysAttachmentRole.setPermission(permissionStr);
+        }
+        return sysAttachmentRoleDao.save(sysAttachmentRole);
     }
 
     @Override
