@@ -128,6 +128,22 @@ public class SysAttactmentController extends BaseController {
      * @return
      * @throws Exception
      */
+    @RequestMapping("/getPersonTree")
+    @ResponseBody
+    public ResultMessage getPersonTree(HttpServletRequest request) throws Exception {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        List<BootStrapTreeViewVo> list = attachmentService.getPersonTree(queryParamMap);
+        resultMessage.setData(list);
+        return resultMessage;
+    }
+
+    /**
+     * 获取文件树
+     *
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/getAttByParentId")
     @ResponseBody
     public ResultMessage getAttByParentId(HttpServletRequest request) throws Exception {

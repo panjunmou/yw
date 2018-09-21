@@ -226,6 +226,11 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
+    public List<BootStrapTreeViewVo> getPersonTree(Map<String, Object> queryParamMap) {
+        return null;
+    }
+
+    @Override
     public List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap) {
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
         String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
