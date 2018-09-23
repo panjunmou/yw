@@ -188,7 +188,14 @@
             url: "/common/attachmentRole/save",
             data: roleData,
             success: function (data) {
-                console.log(data);
+                if (data.result == 1) {
+                    parent.layer.msg("操作成功");
+                    parent.reLoad();
+                    var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+                    parent.layer.close(index);
+                } else {
+                    parent.layer.msg(data.msg);
+                }
             }
         });
     }
