@@ -2,13 +2,15 @@ package com.bootdo.common.service.impl;
 
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.dao.SysAttachmentDao;
+import com.bootdo.common.dao.SysAttachmentMapper;
 import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.SysAttachmentService;
 import com.bootdo.common.utils.BeanMapper;
+import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.common.utils.StringUtil;
-import com.bootdo.common.vo.AttachmentVO;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.BootStrapTreeViewVoState;
+import com.bootdo.common.vo.SysAttachmentVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,8 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     private BootdoConfig bootdoConfig;
     @Resource
     private SysAttachmentDao sysAttachmentDao;
+    @Resource
+    private SysAttachmentMapper sysAttachmentMapper;
 
     /**
      * 获取文件列表
@@ -48,10 +52,10 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
-    public AttachmentVO addAttachment(String newPath, AttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException {
+    public SysAttachmentVO addAttachment(String newPath, SysAttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException {
         File f1 = new File(newPath);
 //        File f2 = new File(attachPath);
-        AttachmentVO vo = new AttachmentVO();
+        SysAttachmentVO vo = new SysAttachmentVO();
         String fullName = f1.getName();
         String fileName = fullName;
         if (fullName.indexOf(".") > 0) {
@@ -75,7 +79,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         attachment.setParentId(parentAtt == null ? 0l : parentAtt.getId());
         attachment = attachmentDao.save(attachment);
 
-        AttachmentVO rvo = new AttachmentVO();
+        SysAttachmentVO rvo = new SysAttachmentVO();
         BeanUtils.copyProperties(attachment, rvo);
         return rvo;
     }
@@ -84,7 +88,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * 添加附件
      */
     @Override
-    public Long add(AttachmentVO vo) {
+    public Long add(SysAttachmentVO vo) {
         SysAttachment attachment = new SysAttachment();
         BeanUtils.copyProperties(vo, attachment);
         SysAttachment att = attachmentDao.save(attachment);
@@ -107,8 +111,8 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * @param id
      */
     @Override
-    public AttachmentVO getById(Long id) {
-        AttachmentVO vo = new AttachmentVO();
+    public SysAttachmentVO getById(Long id) {
+        SysAttachmentVO vo = new SysAttachmentVO();
         SysAttachment attachment = attachmentDao.findById(id).get();
         BeanUtils.copyProperties(attachment, vo);
         return vo;
@@ -120,13 +124,13 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * @param ids
      */
     @Override
-    public List<AttachmentVO> findByIds(String ids) throws Exception {
-        List<AttachmentVO> voList = new ArrayList<AttachmentVO>();
+    public List<SysAttachmentVO> findByIds(String ids) throws Exception {
+        List<SysAttachmentVO> voList = new ArrayList<SysAttachmentVO>();
         String[] idsArr = ids.split("\\,");
         for (int i = 0; i < idsArr.length; i++) {
             if (StringUtil.isNotEmpty(idsArr[i])) {
                 SysAttachment po = attachmentDao.findById(Long.valueOf(idsArr[i])).get();
-                AttachmentVO vo = new AttachmentVO();
+                SysAttachmentVO vo = new SysAttachmentVO();
                 BeanMapper.copy(po, vo);
                 //if (vo != null) {
                 voList.add(vo);
@@ -227,7 +231,78 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
 
     @Override
     public List<BootStrapTreeViewVo> getPersonTree(Map<String, Object> queryParamMap) {
-        return null;
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
+        List<BootStrapTreeViewVo> list = getByPersionParentId(queryParamMap);
+        if (parentId.equals("0")) {
+            BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
+            bootStrapTreeViewVo.setId("0");
+            bootStrapTreeViewVo.setText("上海尧伟建设");
+            BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
+            state.setExpanded(true);
+            bootStrapTreeViewVo.setParentId(null);
+            bootStrapTreeViewVo.setState(state);
+            list.add(bootStrapTreeViewVo);
+        }
+        List<BootStrapTreeViewVo> bootStrapTreeViewVos = BootStrapTreeViewVo.listToTree(list);
+        return bootStrapTreeViewVos;
+    }
+
+    @Override
+    public List<BootStrapTreeViewVo> getByPersionParentId(Map<String, Object> queryParamMap) {
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
+        String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
+        queryParamMap.put("userId", ShiroUtils.getUserId());
+        queryParamMap.put("parentId", parentId);
+        List<SysAttachmentVO> sysAttachmentList = sysAttachmentMapper.getByPersonParentId(queryParamMap);
+        List<BootStrapTreeViewVo> list = new ArrayList<BootStrapTreeViewVo>();
+        if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
+            Map<Long, SysAttachmentVO> sysAttachmentVOMap = new HashMap<>();
+            for (int i = 0; i < sysAttachmentList.size(); i++) {
+                SysAttachmentVO sysAttachmentVO = sysAttachmentList.get(i);
+                Long id = sysAttachmentVO.getId();
+                SysAttachmentVO attachmentVO = sysAttachmentVOMap.get(id);
+                if (attachmentVO == null) {
+                    sysAttachmentVOMap.put(id, sysAttachmentVO);
+                } else {
+                    Integer level = attachmentVO.getLevel();
+                    Integer voLevel = sysAttachmentVO.getLevel();
+                    if (voLevel > level) {
+                        sysAttachmentVOMap.put(id, sysAttachmentVO);
+                    }else{
+                        String permission = attachmentVO.getPermission();
+                        String voPermission = sysAttachmentVO.getPermission();
+                        if (voPermission.length() > permission.length()) {
+                            sysAttachmentVOMap.put(id, sysAttachmentVO);
+                        }
+                    }
+                }
+            }
+            for (SysAttachmentVO sysAttachmentVO : sysAttachmentVOMap.values()) {
+                Integer isDirectory = sysAttachmentVO.getIsDirectory();
+                BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
+                bootStrapTreeViewVo.setText(sysAttachmentVO.getOriginalFullName());
+                bootStrapTreeViewVo.setId(sysAttachmentVO.getId().toString());
+                if (isDirectory == 1) {
+                    //是文件夹
+//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-folder-close");
+                    bootStrapTreeViewVo.setLazyLoad(true);
+                } else {
+//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-file");
+                    //是文件
+                    if (containsFile.equals("0")) {
+                        //不要包含文件,跳过
+                        continue;
+                    }
+                    bootStrapTreeViewVo.setLazyLoad(false);
+                }
+                BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
+                bootStrapTreeViewVo.setParentId(sysAttachmentVO.getParentId().toString());
+                state.setExpanded(false);
+                bootStrapTreeViewVo.setState(state);
+                list.add(bootStrapTreeViewVo);
+            }
+        }
+        return list;
     }
 
     @Override

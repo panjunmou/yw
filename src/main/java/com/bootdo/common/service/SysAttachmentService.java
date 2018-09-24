@@ -1,7 +1,7 @@
 package com.bootdo.common.service;
 
 import com.bootdo.common.domain.SysAttachment;
-import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.SysAttachmentVO;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 
 import java.io.IOException;
@@ -11,15 +11,15 @@ import java.util.Map;
 public interface SysAttachmentService {
     List<SysAttachment> listFlie(Map<String, Object> queryParamMap) throws Exception;
 
-    AttachmentVO addAttachment(String newPath, AttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException;
+    SysAttachmentVO addAttachment(String newPath, SysAttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException;
 
-    Long add(AttachmentVO vo);
+    Long add(SysAttachmentVO vo);
 
     void deleteById(Long id);
 
-    AttachmentVO getById(Long id);
+    SysAttachmentVO getById(Long id);
 
-    List<AttachmentVO> findByIds(String ids) throws Exception;
+    List<SysAttachmentVO> findByIds(String ids) throws Exception;
 
     List<SysAttachment> getAttachmentByMd5(String wholeMd5);
 
@@ -28,6 +28,8 @@ public interface SysAttachmentService {
     void initFile(Map<String, Object> queryParamMap) throws Exception;
 
     List<BootStrapTreeViewVo> getAttachmentTree(Map<String, Object> queryParamMap);
+
+    List<BootStrapTreeViewVo> getByPersionParentId(Map<String, Object> queryParamMap);
 
     List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap);
 

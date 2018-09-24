@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.common.dao.SysAttachmentMapper">
+
+    <select id="get" resultType="com.bootdo.common.domain.SysAttachment">
+		select `id`,`file_ext`,`file_md5`,`file_size`,`original_full_name`,`original_file_name`,`persisted_file_name`,`parent_id`,`path`,`is_directory`,`create_id`,`create_name`,`create_date`,`update_date`,`update_name`,`update_id` from sys_attachment where id = #{value}
+	</select>
+
+    <select id="list" resultType="com.bootdo.common.domain.SysAttachment">
+        select
+        `id`,`file_ext`,`file_md5`,`file_size`,`original_full_name`,`original_file_name`,`persisted_file_name`,`parent_id`,`path`,`is_directory`,`create_id`,`create_name`,`create_date`,`update_date`,`update_name`,`update_id`
+        from sys_attachment
+        <where>
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="fileExt != null and fileExt != ''">and file_ext = #{fileExt}</if>
+            <if test="fileMd5 != null and fileMd5 != ''">and file_md5 = #{fileMd5}</if>
+            <if test="fileSize != null and fileSize != ''">and file_size = #{fileSize}</if>
+            <if test="originalFullName != null and originalFullName != ''">and original_full_name =
+                #{originalFullName}
+            </if>
+            <if test="originalFileName != null and originalFileName != ''">and original_file_name =
+                #{originalFileName}
+            </if>
+            <if test="persistedFileName != null and persistedFileName != ''">and persisted_file_name =
+                #{persistedFileName}
+            </if>
+            <if test="parentId != null and parentId != ''">and parent_id = #{parentId}</if>
+            <if test="path != null and path != ''">and path = #{path}</if>
+            <if test="isDirectory != null and isDirectory != ''">and is_directory = #{isDirectory}</if>
+            <if test="createId != null and createId != ''">and create_id = #{createId}</if>
+            <if test="createName != null and createName != ''">and create_name = #{createName}</if>
+            <if test="createDate != null and createDate != ''">and create_date = #{createDate}</if>
+            <if test="updateDate != null and updateDate != ''">and update_date = #{updateDate}</if>
+            <if test="updateName != null and updateName != ''">and update_name = #{updateName}</if>
+            <if test="updateId != null and updateId != ''">and update_id = #{updateId}</if>
+        </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="getByPersonParentId" resultType="com.bootdo.common.vo.SysAttachmentVO">
+        select *
+        from (select permission, 1 as level, sa.*
+        from sys_attachment_role sar
+        left join sys_attachment sa on sar.attactment_id = sa.id
+        where relation_id = #{userId}
+        and permission like '%view%'
+        union all
+        select 'view', 0, sa.*
+        from sys_attachment sa
+        where id in (SELECT substring_index(
+        substring_index(t.path, '.', b.help_topic_id + 1),
+        '.', -1)
+        FROM (select *
+        from sys_attachment
+        where id in (select attactment_id from sys_attachment_role where relation_id = #{userId})) t
+        join mysql.help_topic b ON b.help_topic_id &lt;
+        (LENGTH(t.path) - LENGTH(REPLACE(t.path, '.', '')) + 1))
+        ) att
+        <where>
+            1=1
+            <if test="parentId != null and parentId != ''"> and att.parent_id = #{parentId} </if>
+        </where>
+    </select>
+
+    <select id="count" resultType="int">
+        select count(*) from sys_attachment
+        <where>
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="fileExt != null and fileExt != ''">and file_ext = #{fileExt}</if>
+            <if test="fileMd5 != null and fileMd5 != ''">and file_md5 = #{fileMd5}</if>
+            <if test="fileSize != null and fileSize != ''">and file_size = #{fileSize}</if>
+            <if test="originalFullName != null and originalFullName != ''">and original_full_name =
+                #{originalFullName}
+            </if>
+            <if test="originalFileName != null and originalFileName != ''">and original_file_name =
+                #{originalFileName}
+            </if>
+            <if test="persistedFileName != null and persistedFileName != ''">and persisted_file_name =
+                #{persistedFileName}
+            </if>
+            <if test="parentId != null and parentId != ''">and parent_id = #{parentId}</if>
+            <if test="path != null and path != ''">and path = #{path}</if>
+            <if test="isDirectory != null and isDirectory != ''">and is_directory = #{isDirectory}</if>
+            <if test="createId != null and createId != ''">and create_id = #{createId}</if>
+            <if test="createName != null and createName != ''">and create_name = #{createName}</if>
+            <if test="createDate != null and createDate != ''">and create_date = #{createDate}</if>
+            <if test="updateDate != null and updateDate != ''">and update_date = #{updateDate}</if>
+            <if test="updateName != null and updateName != ''">and update_name = #{updateName}</if>
+            <if test="updateId != null and updateId != ''">and update_id = #{updateId}</if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.bootdo.common.domain.SysAttachment">
+		insert into sys_attachment
+		(
+			`id`, 
+			`file_ext`, 
+			`file_md5`, 
+			`file_size`, 
+			`original_full_name`, 
+			`original_file_name`, 
+			`persisted_file_name`, 
+			`parent_id`, 
+			`path`, 
+			`is_directory`, 
+			`create_id`, 
+			`create_name`, 
+			`create_date`, 
+			`update_date`, 
+			`update_name`, 
+			`update_id`
+		)
+		values
+		(
+			#{id}, 
+			#{fileExt}, 
+			#{fileMd5}, 
+			#{fileSize}, 
+			#{originalFullName}, 
+			#{originalFileName}, 
+			#{persistedFileName}, 
+			#{parentId}, 
+			#{path}, 
+			#{isDirectory}, 
+			#{createId}, 
+			#{createName}, 
+			#{createDate}, 
+			#{updateDate}, 
+			#{updateName}, 
+			#{updateId}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.bootdo.common.domain.SysAttachment">
+        update sys_attachment
+        <set>
+            <if test="fileExt != null">`file_ext` = #{fileExt},</if>
+            <if test="fileMd5 != null">`file_md5` = #{fileMd5},</if>
+            <if test="fileSize != null">`file_size` = #{fileSize},</if>
+            <if test="originalFullName != null">`original_full_name` = #{originalFullName},</if>
+            <if test="originalFileName != null">`original_file_name` = #{originalFileName},</if>
+            <if test="persistedFileName != null">`persisted_file_name` = #{persistedFileName},</if>
+            <if test="parentId != null">`parent_id` = #{parentId},</if>
+            <if test="path != null">`path` = #{path},</if>
+            <if test="isDirectory != null">`is_directory` = #{isDirectory},</if>
+            <if test="createId != null">`create_id` = #{createId},</if>
+            <if test="createName != null">`create_name` = #{createName},</if>
+            <if test="createDate != null">`create_date` = #{createDate},</if>
+            <if test="updateDate != null">`update_date` = #{updateDate},</if>
+            <if test="updateName != null">`update_name` = #{updateName},</if>
+            <if test="updateId != null">`update_id` = #{updateId}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="remove">
+		delete from sys_attachment where id = #{value}
+	</delete>
+
+    <delete id="batchRemove">
+        delete from sys_attachment where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

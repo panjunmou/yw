@@ -7,7 +7,7 @@ import com.bootdo.common.utils.CommonUtils;
 import com.bootdo.common.utils.RequestUtil;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.common.utils.StringUtil;
-import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.SysAttachmentVO;
 import com.bootdo.common.vo.ResultMessage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -187,7 +187,7 @@ public class WebUploaderController extends BaseController {
         System.out.println("WebUploaderController.fileMerge");
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
-        AttachmentVO parentAtt = attachmentService.getById(Long.parseLong(parentId));
+        SysAttachmentVO parentAtt = attachmentService.getById(Long.parseLong(parentId));
         String persistedFileName = parentAtt.getPersistedFileName();
         String path = bootdoConfig.getAttachBasePath() + persistedFileName;
 
@@ -244,14 +244,14 @@ public class WebUploaderController extends BaseController {
             String tempMD5 = CommonUtils.getMd5ByFile(tempFile);
             if (wholeMd5.equals(tempMD5)) {
                 File newFile = new File(newPath);
-                AttachmentVO avo;
+                SysAttachmentVO avo;
                 if (!newFile.exists()) {
                     avo = attachmentService.addAttachment(newPath, parentAtt, originalFileName, extName,
                             newFile.length(), wholeMd5); //更新附件存储路径
                 } else {
                     String pFileName = newPath.replace(bootdoConfig.getAttachBasePath(), "").replaceAll("\\\\", "/");
                     SysAttachment sysAttachment = attachmentService.getByPersistedFileName(pFileName);
-                    avo = new AttachmentVO();
+                    avo = new SysAttachmentVO();
                     BeanUtils.copyProperties(sysAttachment, avo);
                 }
                 FileUtils.copyFile(tempFile, newFile);

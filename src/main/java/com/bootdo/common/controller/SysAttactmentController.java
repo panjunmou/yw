@@ -160,6 +160,22 @@ public class SysAttactmentController extends BaseController {
      * @return
      * @throws Exception
      */
+    @RequestMapping("/getByPersionParentId")
+    @ResponseBody
+    public ResultMessage getByPersionParentId(HttpServletRequest request) throws Exception {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        List<BootStrapTreeViewVo> list = attachmentService.getByPersionParentId(queryParamMap);
+        resultMessage.setData(list);
+        return resultMessage;
+    }
+
+    /**
+     * 获取文件树
+     *
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/getNavList")
     @ResponseBody
     public ResultMessage getNavList(HttpServletRequest request) throws Exception {

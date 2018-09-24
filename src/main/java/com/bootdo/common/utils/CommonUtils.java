@@ -1,7 +1,7 @@
 package com.bootdo.common.utils;
 
 import com.bootdo.common.service.SysAttachmentService;
-import com.bootdo.common.vo.AttachmentVO;
+import com.bootdo.common.vo.SysAttachmentVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -111,7 +111,7 @@ public class CommonUtils {
                                           HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
         long fileId = id;
         if (fileId != 0L) {
-            AttachmentVO attachVO = attachmentService.getById(fileId);
+            SysAttachmentVO attachVO = attachmentService.getById(fileId);
             if (null != attachVO) {
                 String filePath = attachVO.getPersistedFileName();
                 if (StringUtil.isEmpty(filePath)) {
