@@ -5,6 +5,7 @@ import com.bootdo.common.service.SysAttachmentService;
 import com.bootdo.common.utils.RequestUtil;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.ResultMessage;
+import com.bootdo.common.vo.SysAttachmentVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -75,7 +76,7 @@ public class SysAttactmentController extends BaseController {
         ResultMessage resultMessage = new ResultMessage();
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         try {
-            List<SysAttachment> sysAttachmentList = attachmentService.listFlie(queryParamMap);
+            List<SysAttachmentVO> sysAttachmentList = attachmentService.listFlie(queryParamMap);
             resultMessage.setData(sysAttachmentList);
         } catch (Exception e) {
             logger.error(e.getMessage());

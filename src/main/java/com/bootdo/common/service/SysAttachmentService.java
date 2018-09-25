@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface SysAttachmentService {
-    List<SysAttachment> listFlie(Map<String, Object> queryParamMap) throws Exception;
+    List<SysAttachmentVO> listFlie(Map<String, Object> queryParamMap) throws Exception;
 
     SysAttachmentVO addAttachment(String newPath, SysAttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException;
 

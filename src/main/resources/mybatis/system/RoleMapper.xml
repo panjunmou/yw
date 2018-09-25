@@ -9,6 +9,14 @@
 		from sys_role where role_id = #{value}
 	</select>
 
+	<select id="getByUserId" resultType="com.bootdo.system.domain.RoleDO">
+		select
+		`role_id`,`role_name`,`role_sign`,`remark`,`user_id_create`,`gmt_create`,`gmt_modified`
+		from sys_role
+		where role_id in
+      (select role_id from sys_user_role where user_id = #{userId})
+	</select>
+
 	<select id="list" resultType="com.bootdo.system.domain.RoleDO">
 		select
 		`role_id`,`role_name`,`role_sign`,`remark`,`user_id_create`,`gmt_create`,`gmt_modified`

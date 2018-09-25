@@ -1,11 +1,10 @@
 package com.bootdo.system.dao;
 
 import com.bootdo.system.domain.RoleDO;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
-
-import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 角色
@@ -19,7 +18,9 @@ public interface RoleDao {
 	RoleDO get(Long roleId);
 	
 	List<RoleDO> list(Map<String,Object> map);
-	
+
+	List<RoleDO> getByUserId(Map<String,Object> map);
+
 	int count(Map<String,Object> map);
 	
 	int save(RoleDO role);

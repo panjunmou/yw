@@ -11,6 +11,8 @@ import com.bootdo.common.utils.StringUtil;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.BootStrapTreeViewVoState;
 import com.bootdo.common.vo.SysAttachmentVO;
+import com.bootdo.system.dao.RoleDao;
+import com.bootdo.system.domain.RoleDO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,8 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     private SysAttachmentDao sysAttachmentDao;
     @Resource
     private SysAttachmentMapper sysAttachmentMapper;
+    @Resource
+    private RoleDao roleDao;
 
     /**
      * 获取文件列表
@@ -45,10 +49,70 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * @return
      */
     @Override
-    public List<SysAttachment> listFlie(Map<String, Object> queryParamMap) throws Exception {
+    public List<SysAttachmentVO> listFlie(Map<String, Object> queryParamMap) throws Exception {
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
-        List<SysAttachment> sysAttachmentList = attachmentDao.findByParentId(Long.parseLong(parentId));
+        boolean isSysManager = isSysManager();
+        if (isSysManager) {
+            List<SysAttachment> sysAttachmentList = attachmentDao.findByParentId(Long.parseLong(parentId));
+            List<SysAttachmentVO> sysAttachmenVotList = new ArrayList<>();
+            if (sysAttachmentList != null) {
+                for (int i = 0; i < sysAttachmentList.size(); i++) {
+                    SysAttachment sysAttachment = sysAttachmentList.get(i);
+                    SysAttachmentVO sysAttachmentVO = new SysAttachmentVO();
+                    BeanUtils.copyProperties(sysAttachment, sysAttachmentVO);
+                    sysAttachmenVotList.add(sysAttachmentVO);
+                }
+                return sysAttachmenVotList;
+            }
+            return sysAttachmenVotList;
+
+        }
+        String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
+        queryParamMap.put("userId", ShiroUtils.getUserId());
+        queryParamMap.put("parentId", parentId);
+        List<SysAttachmentVO> sysAttachmentList = sysAttachmentMapper.getByPersonParentId(queryParamMap);
+        if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
+            Map<Long, SysAttachmentVO> sysAttachmentVOMap = new HashMap<>();
+            for (int i = 0; i < sysAttachmentList.size(); i++) {
+                SysAttachmentVO sysAttachmentVO = sysAttachmentList.get(i);
+                Long id = sysAttachmentVO.getId();
+                SysAttachmentVO attachmentVO = sysAttachmentVOMap.get(id);
+                if (attachmentVO == null) {
+                    sysAttachmentVOMap.put(id, sysAttachmentVO);
+                } else {
+                    Integer level = attachmentVO.getLevel();
+                    Integer voLevel = sysAttachmentVO.getLevel();
+                    if (voLevel > level) {
+                        sysAttachmentVOMap.put(id, sysAttachmentVO);
+                    } else {
+                        String permission = attachmentVO.getPermission();
+                        String voPermission = sysAttachmentVO.getPermission();
+                        if (voPermission.length() > permission.length()) {
+                            sysAttachmentVOMap.put(id, sysAttachmentVO);
+                        }
+                    }
+                }
+            }
+            List<SysAttachmentVO> list = new ArrayList<SysAttachmentVO>(sysAttachmentVOMap.values());
+            return list;
+        }
         return sysAttachmentList;
+    }
+
+    private boolean isSysManager() {
+        Map<String, Object> roleMap = new HashMap<>();
+        roleMap.put("userId", ShiroUtils.getUserId());
+        List<RoleDO> roleDOList = roleDao.getByUserId(roleMap);
+        boolean isSysManager = false;
+        for (int i = 0; i < roleDOList.size(); i++) {
+            RoleDO roleDO = roleDOList.get(i);
+            String roleSign = roleDO.getRoleSign();
+            if (roleSign.equalsIgnoreCase(bootdoConfig.getSysManager())) {
+                isSysManager = true;
+                break;
+            }
+        }
+        return isSysManager;
     }
 
     @Override
@@ -232,7 +296,13 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     @Override
     public List<BootStrapTreeViewVo> getPersonTree(Map<String, Object> queryParamMap) {
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
-        List<BootStrapTreeViewVo> list = getByPersionParentId(queryParamMap);
+        boolean sysManager = isSysManager();
+        List<BootStrapTreeViewVo> list;
+        if (sysManager) {
+            return this.getAttachmentTree(queryParamMap);
+        } else {
+            list = getByPersionParentId(queryParamMap);
+        }
         if (parentId.equals("0")) {
             BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
             bootStrapTreeViewVo.setId("0");
@@ -253,7 +323,13 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
         queryParamMap.put("userId", ShiroUtils.getUserId());
         queryParamMap.put("parentId", parentId);
-        List<SysAttachmentVO> sysAttachmentList = sysAttachmentMapper.getByPersonParentId(queryParamMap);
+        boolean sysManager = isSysManager();
+        List<SysAttachmentVO> sysAttachmentList;
+        if (sysManager) {
+            return this.getByParentId(queryParamMap);
+        } else {
+            sysAttachmentList = sysAttachmentMapper.getByPersonParentId(queryParamMap);
+        }
         List<BootStrapTreeViewVo> list = new ArrayList<BootStrapTreeViewVo>();
         if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
             Map<Long, SysAttachmentVO> sysAttachmentVOMap = new HashMap<>();
@@ -268,7 +344,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
                     Integer voLevel = sysAttachmentVO.getLevel();
                     if (voLevel > level) {
                         sysAttachmentVOMap.put(id, sysAttachmentVO);
-                    }else{
+                    } else {
                         String permission = attachmentVO.getPermission();
                         String voPermission = sysAttachmentVO.getPermission();
                         if (voPermission.length() > permission.length()) {
