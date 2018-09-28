@@ -36,12 +36,12 @@
                         <button type="button" class="btn btn-info" onclick="">
                             <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
                         </button>&nbsp;&nbsp;
-                       <!-- <button type="button" class="btn btn-success" onclick="">
-                            <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
-                        </button>&nbsp;&nbsp;
-                        <button type="button" class="btn btn-warning" onclick="">
-                            <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
-                        </button>&nbsp;&nbsp;-->
+                        <!-- <button type="button" class="btn btn-success" onclick="">
+                             <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
+                         </button>&nbsp;&nbsp;
+                         <button type="button" class="btn btn-warning" onclick="">
+                             <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
+                         </button>&nbsp;&nbsp;-->
                         <button type="button" class="btn btn-danger" onclick="">
                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> 删除
                         </button>&nbsp;&nbsp;
@@ -80,6 +80,23 @@
 <form id="AttSearchForm">
     <input type="hidden" name="keyWords" id="orgKeyWord"/>
 </form>
+<div id="contactDialog" style="display: none">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <form class="form-horizontal m-t" id="contactForm">
+                    <div class="form-group">
+                        <label for="dirName" class="col-sm-3 control-label">文件夹名称:</label>
+                        <div class="col-sm-8 rowValidate">
+                            <input type="text" class="form-control" id="dirName"
+                                   name="dirName" placeholder="请输入文件夹名称" maxlength="50"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- 全局js -->
 <script type="text/javascript" src="/js/jquery.min.js?v=2.1.4"></script>
 <script type="text/javascript" src="/js/bootstrap.min.js?v=3.3.6"></script>
@@ -121,7 +138,7 @@
     });
 
     function loadFile(pId) {
-        if(pId == undefined || pId == null || pId == ''){
+        if (pId == undefined || pId == null || pId == '') {
             pId = "0";
         }
         parentId = pId;
@@ -326,11 +343,11 @@
     //权限设置
     function roleSet() {
         var checkedDiv = $("#fileDiv div[data-show='yes']");
-        if(checkedDiv.length == 0 || checkedDiv.length > 1){
+        if (checkedDiv.length == 0 || checkedDiv.length > 1) {
             layer.alert(
                 '请只选择一个文件',
                 {
-                    title:'提示',
+                    title: '提示',
                     time: 0,//不自动关闭,
                     icon: 2
                 }
@@ -351,9 +368,39 @@
     }
 
     function newDir() {
+        layer.open({
+            type: 1,
+            title: '新建文件夹',
+            area: '60%',
+            content: $("#contactDialog"),
+            btnAlign: 'c',
+            btn: ['确定', '取消'],
+            btn1: function (index, layero) {
+                $.ajaxExt({
+                    url: "attactment/mkDir",
+                    data: {
+                        parentId: parentId,
+                        dirName: $("#dirName").val()
+                    },
+                    success: function (data) {
+                        if (data.result == 1) {
+                            layer.msg("新建成功");
+                            layer.close(index);
+                        }
+                        $("#dirName").val('');
+                        reloadFile(parentId);
+                    }
+                });
+            },
+            btn2: function (index, layero) {
+                $("#dirName").val('');
+                layer.close(index);
+            }
+        });
     }
 
     function reloadFile(pId) {
+        parentId = pId;
         $(".template").remove();
         loadFile(pId);
     }

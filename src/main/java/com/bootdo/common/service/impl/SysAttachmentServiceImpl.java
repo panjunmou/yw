@@ -3,7 +3,10 @@ package com.bootdo.common.service.impl;
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.dao.SysAttachmentDao;
 import com.bootdo.common.dao.SysAttachmentMapper;
+import com.bootdo.common.dao.SysAttachmentRoleDao;
 import com.bootdo.common.domain.SysAttachment;
+import com.bootdo.common.domain.SysAttachmentRole;
+import com.bootdo.common.enums.FileRoleEnums;
 import com.bootdo.common.service.SysAttachmentService;
 import com.bootdo.common.utils.BeanMapper;
 import com.bootdo.common.utils.ShiroUtils;
@@ -32,15 +35,15 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * 附件dao
      */
     @Resource
-    private SysAttachmentDao attachmentDao;
+    private SysAttachmentDao sysAttachmentDao;
     @Resource
     private BootdoConfig bootdoConfig;
-    @Resource
-    private SysAttachmentDao sysAttachmentDao;
     @Resource
     private SysAttachmentMapper sysAttachmentMapper;
     @Resource
     private RoleDao roleDao;
+    @Resource
+    private SysAttachmentRoleDao sysAttachmentRoleDao;
 
     /**
      * 获取文件列表
@@ -53,7 +56,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
         boolean isSysManager = isSysManager();
         if (isSysManager) {
-            List<SysAttachment> sysAttachmentList = attachmentDao.findByParentId(Long.parseLong(parentId));
+            List<SysAttachment> sysAttachmentList = sysAttachmentDao.findByParentId(Long.parseLong(parentId));
             List<SysAttachmentVO> sysAttachmenVotList = new ArrayList<>();
             if (sysAttachmentList != null) {
                 for (int i = 0; i < sysAttachmentList.size(); i++) {
@@ -138,10 +141,10 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
 
         SysAttachment attachment = new SysAttachment();
         BeanUtils.copyProperties(vo, attachment);
-        attachment = attachmentDao.save(attachment);
+        attachment = sysAttachmentDao.save(attachment);
         attachment.setPath(parentAtt == null ? attachment.getId().toString() : (parentAtt.getPath() + "." + attachment.getId()));
         attachment.setParentId(parentAtt == null ? 0l : parentAtt.getId());
-        attachment = attachmentDao.save(attachment);
+        attachment = sysAttachmentDao.save(attachment);
 
         SysAttachmentVO rvo = new SysAttachmentVO();
         BeanUtils.copyProperties(attachment, rvo);
@@ -155,7 +158,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     public Long add(SysAttachmentVO vo) {
         SysAttachment attachment = new SysAttachment();
         BeanUtils.copyProperties(vo, attachment);
-        SysAttachment att = attachmentDao.save(attachment);
+        SysAttachment att = sysAttachmentDao.save(attachment);
         return att.getId();
     }
 
@@ -166,7 +169,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      */
     @Override
     public void deleteById(Long id) {
-        attachmentDao.deleteById(id);
+        sysAttachmentDao.deleteById(id);
     }
 
     /**
@@ -177,7 +180,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     @Override
     public SysAttachmentVO getById(Long id) {
         SysAttachmentVO vo = new SysAttachmentVO();
-        SysAttachment attachment = attachmentDao.findById(id).get();
+        SysAttachment attachment = sysAttachmentDao.findById(id).get();
         BeanUtils.copyProperties(attachment, vo);
         return vo;
     }
@@ -193,7 +196,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         String[] idsArr = ids.split("\\,");
         for (int i = 0; i < idsArr.length; i++) {
             if (StringUtil.isNotEmpty(idsArr[i])) {
-                SysAttachment po = attachmentDao.findById(Long.valueOf(idsArr[i])).get();
+                SysAttachment po = sysAttachmentDao.findById(Long.valueOf(idsArr[i])).get();
                 SysAttachmentVO vo = new SysAttachmentVO();
                 BeanMapper.copy(po, vo);
                 //if (vo != null) {
@@ -209,13 +212,13 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      */
     @Override
     public List<SysAttachment> getAttachmentByMd5(String wholeMd5) {
-        return attachmentDao.findByPersistedFileNameLike(wholeMd5);
+        return sysAttachmentDao.findByPersistedFileNameLike(wholeMd5);
     }
 
     @Override
     public List<SysAttachment> findByFileMd5(String wholeMd5) {
         if (!StringUtil.isEmpty(wholeMd5)) {
-            return attachmentDao.findByFileMd5(wholeMd5);
+            return sysAttachmentDao.findByFileMd5(wholeMd5);
         } else
             return new ArrayList();
     }
@@ -385,7 +388,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     public List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap) {
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
         String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
-        List<SysAttachment> sysAttachmentList = attachmentDao.findByParentId(Long.parseLong(parentId));
+        List<SysAttachment> sysAttachmentList = sysAttachmentDao.findByParentId(Long.parseLong(parentId));
         List<BootStrapTreeViewVo> list = new ArrayList<BootStrapTreeViewVo>();
         if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
             for (int i = 0; i < sysAttachmentList.size(); i++) {
@@ -426,7 +429,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         sysAttachment.setId(0l);
         list.add(sysAttachment);
         if (!StringUtil.isEmpty(parentId) && !parentId.equals("0")) {
-            SysAttachment parent = attachmentDao.findById(Long.parseLong(parentId)).get();
+            SysAttachment parent = sysAttachmentDao.findById(Long.parseLong(parentId)).get();
             String path = parent.getPath();
             String[] split = path.split("\\.");
             Long[] idList = new Long[split.length];
@@ -434,7 +437,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
                 String id = split[i];
                 idList[i] = Long.parseLong(id);
             }
-            List<SysAttachment> attachmentList = attachmentDao.findByIdIn(idList);
+            List<SysAttachment> attachmentList = sysAttachmentDao.findByIdIn(idList);
             Collections.sort(attachmentList, new Comparator<SysAttachment>() {
                 @Override
                 public int compare(SysAttachment o1, SysAttachment o2) {
@@ -449,7 +452,39 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
 
     @Override
     public SysAttachment getByPersistedFileName(String persistedFileName) {
-        SysAttachment sysAttachment = attachmentDao.findByPersistedFileName(persistedFileName);
+        SysAttachment sysAttachment = sysAttachmentDao.findByPersistedFileName(persistedFileName);
         return sysAttachment;
+    }
+
+    @Override
+    public void mkDir(Map<String, Object> paraMap) {
+        String dirName = (String) paraMap.get("dirName");
+        String parentId = (String) paraMap.get("parentId");
+        SysAttachment parent = sysAttachmentDao.findById(Long.parseLong(parentId)).get();
+        String persistedFileName = parent.getPersistedFileName();
+        String realPath = bootdoConfig.getAttachBasePath() + persistedFileName + "/" + dirName;
+        //生成数据
+        SysAttachment attachment = new SysAttachment();
+        attachment.setOriginalFullName(dirName);
+        attachment.setOriginalFileName(dirName);
+        attachment.setFileExt("");
+        attachment.setIsDirectory(1);
+        attachment.setPersistedFileName(parent.getPersistedFileName() + "/" + dirName);
+        attachment.setParentId(parent == null ? 0l : parent.getId());
+        attachment.setFileSize(null);
+        sysAttachmentDao.save(attachment);
+        attachment.setPath(parent == null ? attachment.getId().toString() : (parent.getPath() + "." + attachment.getId()));
+        sysAttachmentDao.save(attachment);
+        //赋予权限
+        SysAttachmentRole sysAttachmentRole = new SysAttachmentRole();
+        sysAttachmentRole.setAttactmentId(attachment.getId());
+        sysAttachmentRole.setRelationId(ShiroUtils.getUserId());
+        sysAttachmentRole.setType("person");
+        sysAttachmentRole.setPermission(FileRoleEnums.getValueStr());
+        sysAttachmentRoleDao.save(sysAttachmentRole);
+
+        //创建文件夹
+        File file = new File(realPath);
+        file.mkdir();
     }
 }

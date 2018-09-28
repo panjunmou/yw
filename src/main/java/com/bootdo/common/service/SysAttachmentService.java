@@ -39,4 +39,5 @@ public interface SysAttachmentService {
 
     List<BootStrapTreeViewVo> getPersonTree(Map<String, Object> queryParamMap);
 
+    void mkDir(Map<String, Object> paraMap);
 }

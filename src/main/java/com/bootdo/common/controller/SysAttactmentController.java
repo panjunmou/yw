@@ -186,4 +186,20 @@ public class SysAttactmentController extends BaseController {
         resultMessage.setData(list);
         return resultMessage;
     }
+
+    @RequestMapping("/mkDir")
+    @ResponseBody
+    public ResultMessage saveOrUpdate(HttpServletRequest request) throws Exception {
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        ResultMessage resultMessage = new ResultMessage();
+        try {
+            this.attachmentService.mkDir(paraMap);
+            resultMessage.setMessage("新建成功");
+        } catch (Exception e) {
+            resultMessage.setResult(ResultMessage.Error);
+            logger.error(e.getMessage());
+            resultMessage.setMessage(e.getMessage());
+        }
+        return resultMessage;
+    }
 }
