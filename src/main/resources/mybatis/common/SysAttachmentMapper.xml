@@ -66,6 +66,11 @@
         where id in (select attactment_id from sys_attachment_role where relation_id = #{userId})) t
         join mysql.help_topic b ON b.help_topic_id &lt;
         (LENGTH(t.path) - LENGTH(REPLACE(t.path, '.', '')) + 1))
+        union all
+        select (select permission from sys_attachment_role where attactment_id = #{parentId}), 0, sa2.*
+        from sys_attachment sa2
+        where path like '' || #{parentId} || '%'
+        and id &lt;&gt;  #{parentId}
         ) att
         <where>
             1=1
