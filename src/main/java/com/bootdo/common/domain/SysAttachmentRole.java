@@ -27,18 +27,6 @@ public class SysAttachmentRole extends AuditableBaseEntity {
     @Column(name = "permission")
     private String permission;
 
-    @Column(name = "can_read")
-    private Integer canRead;
-
-    @Column(name = "can_upload")
-    private Integer canUpload;
-
-    @Column(name = "can_del")
-    private Integer canDel;
-
-    @Column(name = "can_download")
-    private Integer canDownload;
-
     public String getPermission() {
         return permission;
     }
@@ -69,37 +57,5 @@ public class SysAttachmentRole extends AuditableBaseEntity {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public Integer getCanRead() {
-        return canRead;
-    }
-
-    public void setCanRead(Integer canRead) {
-        this.canRead = canRead;
-    }
-
-    public Integer getCanUpload() {
-        return canUpload;
-    }
-
-    public void setCanUpload(Integer canUpload) {
-        this.canUpload = canUpload;
-    }
-
-    public Integer getCanDel() {
-        return canDel;
-    }
-
-    public void setCanDel(Integer canDel) {
-        this.canDel = canDel;
-    }
-
-    public Integer getCanDownload() {
-        return canDownload;
-    }
-
-    public void setCanDownload(Integer canDownload) {
-        this.canDownload = canDownload;
     }
 }

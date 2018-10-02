@@ -26,4 +26,6 @@ public interface SysAttachmentRoleService {
     int remove(Long id);
 
     int batchRemove(Long[] ids);
+
+    void delById(Long[] ids);
 }

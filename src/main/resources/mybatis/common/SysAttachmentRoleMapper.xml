@@ -4,20 +4,27 @@
 <mapper namespace="com.bootdo.common.dao.SysAttachmentRoleMapper">
 
 	<select id="get" resultType="com.bootdo.common.domain.SysAttachmentRole">
-		select `id`,`attactment_id`,`relation_id`,`type`,`can_read`,`can_upload`,`can_del`,`can_download`,`create_id`,`create_name`,`create_date`,`update_date`,`update_name`,`update_id` from sys_attachment_role where id = #{value}
+		select `id`,`attactment_id`,`relation_id`,`type`,`create_id`,`create_name`,`create_date`,`update_date`,`update_name`,`update_id` from sys_attachment_role where id = #{value}
 	</select>
 
-	<select id="list" resultType="com.bootdo.common.domain.SysAttachmentRole">
-		select `id`,`attactment_id`,`relation_id`,`type`,`can_read`,`can_upload`,`can_del`,`can_download`,`create_id`,`create_name`,`create_date`,`update_date`,`update_name`,`update_id` from sys_attachment_role
-        <where>  
+	<select id="list" resultType="com.bootdo.common.vo.SysAttachmentRoleVO">
+		select sar.*,
+		su.name as relationName,
+		if (find_in_set('view', permission) = 0, -1, 1)       as view,
+		if (find_in_set('down', permission) = 0, -1, 1) as down,
+		if (find_in_set('move', permission) = 0, -1, 1) as move,
+		if (find_in_set('copy', permission) = 0, -1, 1) as copy,
+		if (find_in_set('del', permission) = 0, -1, 1) as del,
+		if (find_in_set('changeName', permission) = 0, -1, 1) as changeName,
+		if (find_in_set('upload', permission) = 0, -1, 1) as upload,
+		if (find_in_set('mkDir', permission) = 0, -1, 1) as mkDir
+		from sys_attachment_role sar
+		left join sys_user su on su.user_id = sar.relation_id
+		<where>
 		  		  <if test="id != null and id != ''"> and id = #{id} </if>
 		  		  <if test="attactmentId != null and attactmentId != ''"> and attactment_id = #{attactmentId} </if>
 		  		  <if test="relationId != null and relationId != ''"> and relation_id = #{relationId} </if>
 		  		  <if test="type != null and type != ''"> and type = #{type} </if>
-		  		  <if test="canRead != null and canRead != ''"> and can_read = #{canRead} </if>
-		  		  <if test="canUpload != null and canUpload != ''"> and can_upload = #{canUpload} </if>
-		  		  <if test="canDel != null and canDel != ''"> and can_del = #{canDel} </if>
-		  		  <if test="canDownload != null and canDownload != ''"> and can_download = #{canDownload} </if>
 		  		  <if test="createId != null and createId != ''"> and create_id = #{createId} </if>
 		  		  <if test="createName != null and createName != ''"> and create_name = #{createName} </if>
 		  		  <if test="createDate != null and createDate != ''"> and create_date = #{createDate} </if>
@@ -45,10 +52,6 @@
 		  		  <if test="attactmentId != null and attactmentId != ''"> and attactment_id = #{attactmentId} </if>
 		  		  <if test="relationId != null and relationId != ''"> and relation_id = #{relationId} </if>
 		  		  <if test="type != null and type != ''"> and type = #{type} </if>
-		  		  <if test="canRead != null and canRead != ''"> and can_read = #{canRead} </if>
-		  		  <if test="canUpload != null and canUpload != ''"> and can_upload = #{canUpload} </if>
-		  		  <if test="canDel != null and canDel != ''"> and can_del = #{canDel} </if>
-		  		  <if test="canDownload != null and canDownload != ''"> and can_download = #{canDownload} </if>
 		  		  <if test="createId != null and createId != ''"> and create_id = #{createId} </if>
 		  		  <if test="createName != null and createName != ''"> and create_name = #{createName} </if>
 		  		  <if test="createDate != null and createDate != ''"> and create_date = #{createDate} </if>
@@ -64,11 +67,7 @@
 			`attactment_id`, 
 			`relation_id`, 
 			`type`, 
-			`can_read`, 
-			`can_upload`, 
-			`can_del`, 
-			`can_download`, 
-			`create_id`, 
+			`create_id`,
 			`create_name`, 
 			`create_date`, 
 			`update_date`, 
@@ -80,11 +79,7 @@
 			#{attactmentId}, 
 			#{relationId}, 
 			#{type}, 
-			#{canRead}, 
-			#{canUpload}, 
-			#{canDel}, 
-			#{canDownload}, 
-			#{createId}, 
+			#{createId},
 			#{createName}, 
 			#{createDate}, 
 			#{updateDate}, 
@@ -99,10 +94,6 @@
 			<if test="attactmentId != null">`attactment_id` = #{attactmentId}, </if>
 			<if test="relationId != null">`relation_id` = #{relationId}, </if>
 			<if test="type != null">`type` = #{type}, </if>
-			<if test="canRead != null">`can_read` = #{canRead}, </if>
-			<if test="canUpload != null">`can_upload` = #{canUpload}, </if>
-			<if test="canDel != null">`can_del` = #{canDel}, </if>
-			<if test="canDownload != null">`can_download` = #{canDownload}, </if>
 			<if test="createId != null">`create_id` = #{createId}, </if>
 			<if test="createName != null">`create_name` = #{createName}, </if>
 			<if test="createDate != null">`create_date` = #{createDate}, </if>

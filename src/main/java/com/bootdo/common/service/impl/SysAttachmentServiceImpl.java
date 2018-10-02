@@ -73,33 +73,13 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
         queryParamMap.put("userId", ShiroUtils.getUserId());
         queryParamMap.put("parentId", parentId);
-        List<SysAttachmentVO> sysAttachmentList = sysAttachmentMapper.getByPersonParentId(queryParamMap);
-        if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
-            Map<Long, SysAttachmentVO> sysAttachmentVOMap = new HashMap<>();
-            for (int i = 0; i < sysAttachmentList.size(); i++) {
-                SysAttachmentVO sysAttachmentVO = sysAttachmentList.get(i);
-                Long id = sysAttachmentVO.getId();
-                SysAttachmentVO attachmentVO = sysAttachmentVOMap.get(id);
-                if (attachmentVO == null) {
-                    sysAttachmentVOMap.put(id, sysAttachmentVO);
-                } else {
-                    Integer level = attachmentVO.getLevel();
-                    Integer voLevel = sysAttachmentVO.getLevel();
-                    if (voLevel > level) {
-                        sysAttachmentVOMap.put(id, sysAttachmentVO);
-                    } else {
-                        String permission = attachmentVO.getPermission();
-                        String voPermission = sysAttachmentVO.getPermission();
-                        if (voPermission.length() > permission.length()) {
-                            sysAttachmentVOMap.put(id, sysAttachmentVO);
-                        }
-                    }
-                }
-            }
-            List<SysAttachmentVO> list = new ArrayList<SysAttachmentVO>(sysAttachmentVOMap.values());
-            return list;
-        }
-        return sysAttachmentList;
+        //获取当前父节点下的所有文件
+        //1.权限就在parentId下的文件,此类文件权限最高
+
+        //2.权限设在子节点上,子节点在此parentId下,此类文件权限最低,仅仅只读
+        //3.权限在父节点上,沿用父节点的权限
+
+        return null;
     }
 
     private boolean isSysManager() {

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -42,26 +43,8 @@ public class SysAttachmentRoleServiceImpl implements SysAttachmentRoleService {
 
     @Override
     public List<SysAttachmentRoleVO> list(Map<String, Object> map) {
-        List<SysAttachmentRole> sysAttachmentRoleList = sysAttachmentRoleMapper.list(map);
-        List<SysAttachmentRoleVO> voList = new ArrayList<>();
-        if (sysAttachmentRoleList != null && !sysAttachmentRoleList.isEmpty()) {
-            for (int i = 0; i < sysAttachmentRoleList.size(); i++) {
-                SysAttachmentRole sysAttachmentRole = sysAttachmentRoleList.get(i);
-                SysAttachmentRoleVO sysAttachmentRoleVO = new SysAttachmentRoleVO();
-                BeanUtils.copyProperties(sysAttachmentRole, sysAttachmentRoleVO);
-                String type = sysAttachmentRole.getType();
-                Long relationId = sysAttachmentRole.getRelationId();
-                if (type.equals("dept")) {
-                    DeptDO deptDO = deptDao.get(relationId);
-                    sysAttachmentRoleVO.setRelationName(deptDO.getName());
-                } else {
-                    UserDO userDO = userDao.get(relationId);
-                    sysAttachmentRoleVO.setRelationName(userDO.getName());
-                }
-                voList.add(sysAttachmentRoleVO);
-            }
-        }
-        return voList;
+        List<SysAttachmentRoleVO> sysAttachmentRoleList = sysAttachmentRoleMapper.list(map);
+        return sysAttachmentRoleList;
     }
 
     @Override
@@ -96,4 +79,10 @@ public class SysAttachmentRoleServiceImpl implements SysAttachmentRoleService {
         return sysAttachmentRoleMapper.batchRemove(ids);
     }
 
+    @Override
+    public void delById(Long[] ids) {
+        Iterable<Long> iterable = Arrays.asList(ids);
+        Iterable<SysAttachmentRole> roleIterable = this.sysAttachmentRoleDao.findAllById(iterable);
+        this.sysAttachmentRoleDao.deleteAll(roleIterable);
+    }
 }

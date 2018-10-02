@@ -7,9 +7,29 @@ public enum FileRoleEnums {
     VIEW("view", "查看"),
 
     /**
-     * 新建文件夹
+     * 下载
      */
-    MKDIR("mkdir", "新建文件夹"),
+    DOWN("down", "下载"),
+
+    /**
+     * 移动
+     */
+    MOVE("move", "移动"),
+
+    /**
+     * 复制
+     */
+    COPY("copy", "复制"),
+
+    /**
+     * 删除
+     */
+    DELETE("delete", "删除"),
+
+    /**
+     * 上传
+     */
+    CHANGENAME("changeName", "重命名"),
 
     /**
      * 上传
@@ -17,14 +37,9 @@ public enum FileRoleEnums {
     UPLOAD("upload", "上传"),
 
     /**
-     * 下载
+     * 新建文件夹
      */
-    DOWNLOAD("download", "下载"),
-
-    /**
-     * 删除
-     */
-    DELETE("delete", "删除");
+    MKDIR("mkdir", "新建文件夹");
 
     private String value;
 

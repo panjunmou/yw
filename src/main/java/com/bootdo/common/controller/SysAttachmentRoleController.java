@@ -108,4 +108,11 @@ public class SysAttachmentRoleController {
         return R.ok();
     }
 
+    @PostMapping("/delByIds")
+    @ResponseBody
+    public ResultMessage delByIds(@RequestParam("ids[]") Long[] ids) {
+        this.attachmentRoleService.delById(ids);
+        return new ResultMessage(ResultMessage.Success, "删除成功");
+    }
+
 }

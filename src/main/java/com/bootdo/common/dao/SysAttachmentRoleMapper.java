@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bootdo.common.domain.SysAttachmentRole;
+import com.bootdo.common.vo.SysAttachmentRoleVO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -17,7 +18,7 @@ public interface SysAttachmentRoleMapper {
 
 	SysAttachmentRole get(Long id);
 	
-	List<SysAttachmentRole> list(Map<String, Object> map);
+	List<SysAttachmentRoleVO> list(Map<String, Object> map);
 	
 	int count(Map<String, Object> map);
 	

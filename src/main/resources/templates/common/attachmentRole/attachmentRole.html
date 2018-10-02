@@ -69,11 +69,12 @@
                 queryParams: function (params) {
                     // 说明：传入后台的参数包括offset开始索引，limit步长，sort排序列，order：desc或者,以及所有列的键值对
                     return {
-                        attactmentId:id,
+                        attactmentId: id,
                         limit: params.limit,
                         offset: params.offset
                     };
                 },
+                clickToSelect: true,
                 // //请求服务器数据时，你可以通过重写参数的方式添加一些额外的参数，例如 toolbar 中的参数 如果
                 // queryParamsType = 'limit' ,返回参数必须包含
                 // limit, offset, search, sort, order 否则, 需要包含:
@@ -85,30 +86,45 @@
                         checkbox: true
                     },
                     {
+                        field: 'id',
+                        title: 'id',
+                        align: 'center',
+                        valign: 'middle',
+                        visible: false
+                    },
+                    {
                         field: 'type',
                         title: '权限类型',
                         align: 'center',
                         valign: 'middle',
-                        formatter : function(value, row, index) {
+                        formatter: function (value, row, index) {
                             if (value == 'dept') {
                                 return '部门';
                             } else {
                                 return '个人';
                             }
-                        }
+                        },
+                        visible: false
                     },
                     {
                         field: 'relationName',
-                        title: '名称',
+                        title: '姓名',
                         align: 'center',
                         valign: 'middle'
                     },
                     {
-                        field: 'canRead',
+                        field: 'relationId',
+                        title: 'relationId',
+                        align: 'center',
+                        valign: 'middle',
+                        visible: false
+                    },
+                    {
+                        field: 'view',
                         title: '可见',
                         align: 'center',
                         valign: 'middle',
-                        formatter : function(value, row, index) {
+                        formatter: function (value, row, index) {
                             if (value == '-1') {
                                 return '<span class="label label-danger">否</span>';
                             } else if (value == '1') {
@@ -117,24 +133,11 @@
                         }
                     },
                     {
-                        field: 'canUpload',
-                        title: '上传',
-                        align: 'center',
-                        valign: 'middle',
-                        formatter : function(value, row, index) {
-                            if (value == '-1') {
-                                return '<span class="label label-danger">否</span>';
-                            } else if (value == '1') {
-                                return '<span class="label label-primary">是</span>';
-                            }
-                        }
-                    },
-                    {
-                        field: 'canDownload',
+                        field: 'down',
                         title: '下载',
                         align: 'center',
                         valign: 'middle',
-                        formatter : function(value, row, index) {
+                        formatter: function (value, row, index) {
                             if (value == '-1') {
                                 return '<span class="label label-danger">否</span>';
                             } else if (value == '1') {
@@ -143,11 +146,76 @@
                         }
                     },
                     {
-                        field: 'canDel',
+                        field: 'move',
+                        title: '移动',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter: function (value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'copy',
+                        title: '复制',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter: function (value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'del',
                         title: '删除',
                         align: 'center',
                         valign: 'middle',
-                        formatter : function(value, row, index) {
+                        formatter: function (value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'changeName',
+                        title: '重命名',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter: function (value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'upload',
+                        title: '上传',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter: function (value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'mkDir',
+                        title: '新建文件夹',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter: function (value, row, index) {
                             if (value == '-1') {
                                 return '<span class="label label-danger">否</span>';
                             } else if (value == '1') {
@@ -171,7 +239,45 @@
             content: 'attachmentRole/add?id=' + id
         });
     }
-    
+
+    function delRole() {
+        var selections = $('#roleTable').bootstrapTable("getSelections");
+        if (selections.length == 0) {
+            layer.msg("请选择要删除的数据");
+            return;
+        }
+        /*var ids = '';
+        $.each(selections, function (i, v) {
+            ids += v.id + ",";
+        });*/
+        var ids = $.map(selections, function (row) {
+            return row.id;
+        });
+        layer.confirm('确定删除吗？',
+            {
+                icon: 3, title: '提示',
+                btn: ['确定', '取消'],
+                btn1: function (index, layero) {
+                    $.ajaxExt({
+                        url: "attachmentRole/delByIds",
+                        type: 'POST',
+                        data: {
+                            ids: ids
+                        },
+                        success: function (data) {
+                            if (data.result == 1) {
+                                layer.msg("删除成功");
+                                layer.close(index);
+                                reLoad();
+                            }
+                        }
+                    });
+                    return false;
+                }
+            }
+        );
+    }
+
     function reLoad() {
         $('#roleTable').bootstrapTable("refresh");
     }
