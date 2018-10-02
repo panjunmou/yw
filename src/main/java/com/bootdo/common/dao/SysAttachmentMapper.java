@@ -30,4 +30,8 @@ public interface SysAttachmentMapper {
     int batchRemove(Long[] ids);
 
     List<SysAttachmentVO> getByPersonParentId(Map<String, Object> map);
+
+    List<SysAttachmentVO> getAttByParentId(Map<String, Object> map);
+
+    List<SysAttachmentVO> getAttFromChild(Map<String, Object> map);
 }

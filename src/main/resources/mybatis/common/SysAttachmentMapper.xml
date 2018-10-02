@@ -172,11 +172,43 @@
         select (select permission from sys_attachment_role where attactment_id = #{parentId}), 0, sa2.*
         from sys_attachment sa2
         where path like concat(concat((select path from sys_attachment sa3 where sa3.id = #{parentId}),'%'),'%')
-        and id &lt;&gt;  #{parentId}
+        and id &lt;&gt; #{parentId}
         ) att
         <where>
             1=1
-            <if test="parentId != null and parentId != ''"> and att.parent_id = #{parentId} </if>
+            <if test="parentId != null and parentId != ''">and att.parent_id = #{parentId}</if>
+        </where>
+    </select>
+
+    <select id="getAttByParentId" resultType="com.bootdo.common.vo.SysAttachmentVO">
+        select *
+        from (
+        select permission, 1 as level, sa.*
+        from sys_attachment_role sar
+        left join sys_attachment sa on sar.attactment_id = sa.id
+        <where>
+            1=1
+            and relation_id = #{userId}
+            and permission like '%view%'
+            <if test="parentId != null and parentId != ''">and sa.parent_id = #{parentId}</if>
+        </where>
+        ) att
+    </select>
+
+    <select id="getAttFromChild" resultType="com.bootdo.common.vo.SysAttachmentVO">
+        select 'view' as permission, 0 as level, sa.*
+        from sys_attachment sa
+        <where>
+            1=1
+            and id in (SELECT substring_index(
+            substring_index(t.path, '.', b.help_topic_id + 1),
+            '.', -1)
+            FROM (select *
+            from sys_attachment
+            where id in (select attactment_id from sys_attachment_role where relation_id = #{userId})) t
+            join mysql.help_topic b
+            ON b.help_topic_id &lt; (LENGTH(t.path) - LENGTH(REPLACE(t.path, '.', '')) + 1))
+            <if test="parentId != null and parentId != ''">and sa.parent_id = #{parentId}</if>
         </where>
     </select>
 

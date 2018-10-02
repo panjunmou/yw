@@ -71,15 +71,34 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
 
         }
         String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
-        queryParamMap.put("userId", ShiroUtils.getUserId());
-        queryParamMap.put("parentId", parentId);
+        Long userId = ShiroUtils.getUserId();
         //获取当前父节点下的所有文件
         //1.权限就在parentId下的文件,此类文件权限最高
-
-        //2.权限设在子节点上,子节点在此parentId下,此类文件权限最低,仅仅只读
-        //3.权限在父节点上,沿用父节点的权限
-
-        return null;
+        Map<String, Object> selectMap = new HashMap<>();
+        selectMap.put("userId", userId);
+        selectMap.put("parentId", parentId);
+        List<SysAttachmentVO> voList = sysAttachmentMapper.getAttByParentId(selectMap);
+        Map<Long, SysAttachmentVO> voMap = new HashMap<>();
+        if (voList != null) {
+            for (int i = 0; i < voList.size(); i++) {
+                SysAttachmentVO sysAttachmentVO = voList.get(i);
+                voMap.put(sysAttachmentVO.getId(), sysAttachmentVO);
+            }
+        }
+        //2.权限在父节点上,沿用父节点的权限
+        //3.权限设在子节点上,子节点在此parentId下,此类文件权限最低,仅仅只读
+        List<SysAttachmentVO> attFromChild = sysAttachmentMapper.getAttFromChild(selectMap);
+        if (attFromChild != null) {
+            for (int i = 0; i < attFromChild.size(); i++) {
+                SysAttachmentVO sysAttachmentVO = attFromChild.get(i);
+                SysAttachmentVO childVo = voMap.get(sysAttachmentVO.getId());
+                if (childVo == null) {
+                    voMap.put(sysAttachmentVO.getId(), sysAttachmentVO);
+                }
+            }
+        }
+        Collection<SysAttachmentVO> voCollection = voMap.values();
+        return new ArrayList<>(voCollection);
     }
 
     private boolean isSysManager() {
