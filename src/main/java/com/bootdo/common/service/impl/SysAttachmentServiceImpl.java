@@ -86,6 +86,24 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
             }
         }
         //2.权限在父节点上,沿用父节点的权限
+        //找到所有父节点
+        String lastParetnPermission = sysAttachmentMapper.getLastParetnPermission(selectMap);
+        if (StringUtil.isNotEmpty(lastParetnPermission)) {
+            List<SysAttachment> sysAttachmentList = sysAttachmentDao.findByParentId(Long.parseLong(parentId));
+            if (sysAttachmentList != null) {
+                for (int i = 0; i < sysAttachmentList.size(); i++) {
+                    SysAttachment attachment = sysAttachmentList.get(i);
+                    SysAttachmentVO attachmentVO = voMap.get(attachment.getId());
+                    if (attachmentVO == null) {
+                        SysAttachmentVO sysAttachmentVO = new SysAttachmentVO();
+                        BeanUtils.copyProperties(attachment, sysAttachmentVO);
+                        sysAttachmentVO.setPermission(lastParetnPermission);
+                        voMap.put(sysAttachmentVO.getId(), sysAttachmentVO);
+                    }
+                }
+            }
+        }
+
         //3.权限设在子节点上,子节点在此parentId下,此类文件权限最低,仅仅只读
         List<SysAttachmentVO> attFromChild = sysAttachmentMapper.getAttFromChild(selectMap);
         if (attFromChild != null) {

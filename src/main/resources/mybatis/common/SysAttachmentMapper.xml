@@ -180,10 +180,11 @@
         </where>
     </select>
 
+
     <select id="getAttByParentId" resultType="com.bootdo.common.vo.SysAttachmentVO">
         select *
         from (
-        select permission, 1 as level, sa.*
+        select permission, sa.*
         from sys_attachment_role sar
         left join sys_attachment sa on sar.attactment_id = sa.id
         <where>
@@ -196,7 +197,7 @@
     </select>
 
     <select id="getAttFromChild" resultType="com.bootdo.common.vo.SysAttachmentVO">
-        select 'view' as permission, 0 as level, sa.*
+        select 'view' as permission, sa.*
         from sys_attachment sa
         <where>
             1=1
@@ -212,5 +213,20 @@
         </where>
     </select>
 
-
+    <select id="getLastParetnPermission" resultType="java.lang.String">
+        select sar.permission
+        from sys_attachment sa
+        left join sys_attachment_role sar on sar.attactment_id = sa.id
+        where 1 = 1
+        and sa.id in (SELECT substring_index(
+        substring_index(t.path, '.', b.help_topic_id + 1),
+        '.', -1)
+        FROM (select * from sys_attachment where id = #{parentId}) t
+        join mysql.help_topic b ON b.help_topic_id &lt;
+        (LENGTH(t.path) - LENGTH(REPLACE(t.path, '.', '')) + 1))
+        and sar.permission is not null
+        and sar.relation_id = #{userId}
+        order by length(sa.path) desc
+        limit 1
+    </select>
 </mapper>

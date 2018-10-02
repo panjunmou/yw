@@ -34,4 +34,6 @@ public interface SysAttachmentMapper {
     List<SysAttachmentVO> getAttByParentId(Map<String, Object> map);
 
     List<SysAttachmentVO> getAttFromChild(Map<String, Object> map);
+
+    String getLastParetnPermission(Map<String, Object> map);
 }
