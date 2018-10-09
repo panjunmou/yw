@@ -119,7 +119,8 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         return new ArrayList<>(voCollection);
     }
 
-    private boolean isSysManager() {
+    @Override
+    public boolean isSysManager() {
         Map<String, Object> roleMap = new HashMap<>();
         roleMap.put("userId", ShiroUtils.getUserId());
         List<RoleDO> roleDOList = roleDao.getByUserId(roleMap);

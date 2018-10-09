@@ -26,26 +26,31 @@
         <div class="col-sm-9">
             <div id="right-content" class="right-content">
                 <div class="zuijinTop">
-                    <div style="margin-top: 12px">
-                        <button type="button" class="btn btn-info" onclick="newDir()">
-                            <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新建文件夹
-                        </button>&nbsp;&nbsp;
-                        <button type="button" class="btn btn-primary" onclick="upload()">
+                    <div style="margin-top: 12px;display: none" id="btns">
+                        <button type="button" id="uploadBtn" class="btn btn-primary" onclick="upload()"
+                                disabled="disabled">
                             <i class="glyphicon glyphicon-upload" aria-hidden="true"></i> 上传文件
                         </button>&nbsp;&nbsp;
-                        <button type="button" class="btn btn-info" onclick="">
+                        <button type="button" id="newDirBtn" class="btn btn-info" onclick="newDir()"
+                                disabled="disabled">
+                            <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新建文件夹
+                        </button>&nbsp;&nbsp;
+                        <button type="button" id="downBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
                         </button>&nbsp;&nbsp;
-                        <!-- <button type="button" class="btn btn-success" onclick="">
-                             <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
-                         </button>&nbsp;&nbsp;
-                         <button type="button" class="btn btn-warning" onclick="">
-                             <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
-                         </button>&nbsp;&nbsp;-->
-                        <button type="button" class="btn btn-danger" onclick="">
+                        <button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
+                            <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> 复制
+                        </button>&nbsp;&nbsp;
+                        <button type="button" id="moveBtn" class="btn btn-info" onclick="" disabled="disabled">
+                            <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
+                        </button>&nbsp;&nbsp;
+                        <button type="button" id="changeNameBtn" class="btn btn-info" onclick="" disabled="disabled">
+                            <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
+                        </button>&nbsp;&nbsp;
+                        <button type="button" id="delBtn" class="btn btn-danger" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> 删除
                         </button>&nbsp;&nbsp;
-                        <button type="button" class="btn btn-warning" onclick="roleSet()">
+                        <button type="button" id="roleBtn" class="btn btn-warning" onclick="roleSet()">
                             <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 权限设置
                         </button>
                     </div>
@@ -111,8 +116,8 @@
         positionClass: "toast-center-center",
         timeOut: "1300"
     };
-    // var parentId = [[${parentId}]];
     var parentId;
+    var canMkDir = false;
     $(function () {
         //组织机构树
         initOrgTree();
@@ -138,10 +143,16 @@
     });
 
     function loadFile(pId) {
+        disabledAllBtn();
         if (pId == undefined || pId == null || pId == '') {
             pId = "0";
         }
         parentId = pId;
+        if (parentId == '0') {
+            $("#btns").hide();
+        } else {
+            $("#btns").show();
+        }
         $.ajaxExt({
             url: 'attactment/listFile',
             type: 'GET',
@@ -156,13 +167,13 @@
                         var fileStr = "";
                         if (attachment.isDirectory == 1) {
                             fileStr +=
-                                '<div class="box template" data-show="no" id="' + attachment.id + '" isDirectory="1">\n';
+                                '<div class="box template" data-show="no" permission="' + attachment.permission + '" id="' + attachment.id + '" isDirectory="1">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/wenjian.png" class="myIcon" alt="">\n';
                         } else {
                             var picStr = getPic(attachment.fileExt);
                             fileStr +=
-                                '<div class="box2 template" data-show="no" id="' + attachment.id + '" isDirectory="0">\n';
+                                '<div class="box2 template" data-show="no" permission="\'+attachment.permission+\'" id="' + attachment.id + '" isDirectory="0">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/' + picStr + '" class="myIcon" alt="">\n';
                         }
@@ -262,16 +273,43 @@
         $(".content .template").each(function () {
             $(this).click(function () {
                 if ($(this).attr("data-show") == "yes") {
+                    //取消选中
+                    //这是样式
                     $(this).removeClass(".box2C");
                     $(this).removeClass(".box2H");
                     $(this).find(".select").attr("src", "/img/attactment/select.png");
                     $(this).attr("data-show", "no");
+                    disabledAllBtn();
                 } else {
+                    //选中
                     $(this).addClass(".box2C");
                     $(this).addClass(".box2H");
                     $(this).find(".select").attr("src", "/img/attactment/selectC.png");
                     $(this).attr("data-show", "yes");
                     $(this).find(".select").show();
+                    //控制按钮权限
+                    var permission = $(this).attr("permission");
+                    if (permission.indexOf("down") >= 0) {
+                        $("#downBtn").attr("disabled", false);
+                    }
+                    if (permission.indexOf("move") >= 0) {
+                        $("#moveBtn").attr("disabled", false);
+                    }
+                    if (permission.indexOf("copy") >= 0) {
+                        $("#copyBtn").attr("disabled", false);
+                    }
+                    if (permission.indexOf("del") >= 0) {
+                        $("#delBtn").attr("disabled", false);
+                    }
+                    if (permission.indexOf("changeName") >= 0) {
+                        $("#changeNameBtn").attr("disabled", false);
+                    }
+                    if (permission.indexOf("upload") >= 0) {
+                        $("#uploadBtn").attr("disabled", false);
+                    }
+                    if (canMkDir) {
+                        $("#newDirBtn").attr("disabled", false);
+                    }
                 }
             });
             $(this).dblclick(function () {
@@ -282,6 +320,16 @@
                 }
             });
         });
+    }
+
+    function disabledAllBtn() {
+        $("#downBtn").attr("disabled", true);
+        $("#moveBtn").attr("disabled", true);
+        $("#copyBtn").attr("disabled", true);
+        $("#delBtn").attr("disabled", true);
+        $("#changeNameBtn").attr("disabled", true);
+        $("#uploadBtn").attr("disabled", true);
+        $("#newDirBtn").attr("disabled", true);
     }
 
     function initOrgTree() {
@@ -401,6 +449,12 @@
 
     function reloadFile(pId) {
         parentId = pId;
+        var parentPermission = $("#" + pId).attr("permission");
+        if (parentPermission != undefined && parentPermission != null && parentPermission.indexOf("mkdir") >= 0) {
+            canMkDir = true;
+        } else {
+            canMkDir = false;
+        }
         $(".template").remove();
         loadFile(pId);
     }

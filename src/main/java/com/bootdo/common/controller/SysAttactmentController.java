@@ -43,8 +43,10 @@ public class SysAttactmentController extends BaseController {
     @RequestMapping("")
     public String page(Model model, HttpServletRequest request) throws Exception {
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        String parentId = (String) queryParamMap.get("parentId");
+        boolean isManager = attachmentService.isSysManager();
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
         model.addAttribute("parentId", parentId);
+        model.addAttribute("isManager", isManager);
         return "common/attactment/initPage";
     }
 
