@@ -38,7 +38,7 @@
                         <button type="button" id="downBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
                         </button>&nbsp;&nbsp;
-                        <button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
+                        <!--<button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> 复制
                         </button>&nbsp;&nbsp;
                         <button type="button" id="moveBtn" class="btn btn-info" onclick="" disabled="disabled">
@@ -46,7 +46,7 @@
                         </button>&nbsp;&nbsp;
                         <button type="button" id="changeNameBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
-                        </button>&nbsp;&nbsp;
+                        </button>&nbsp;&nbsp;-->
                         <button type="button" id="delBtn" class="btn btn-danger" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> 删除
                         </button>&nbsp;&nbsp;
@@ -118,6 +118,7 @@
     };
     var parentId;
     var canMkDir = false;
+    var canUpload = false;
     $(function () {
         //组织机构树
         initOrgTree();
@@ -173,7 +174,7 @@
                         } else {
                             var picStr = getPic(attachment.fileExt);
                             fileStr +=
-                                '<div class="box2 template" data-show="no" permission="\'+attachment.permission+\'" id="' + attachment.id + '" isDirectory="0">\n';
+                                '<div class="box2 template" data-show="no" permission="' + attachment.permission + '" id="' + attachment.id + '" isDirectory="0">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/' + picStr + '" class="myIcon" alt="">\n';
                         }
@@ -292,24 +293,18 @@
                     if (permission.indexOf("down") >= 0) {
                         $("#downBtn").attr("disabled", false);
                     }
-                    if (permission.indexOf("move") >= 0) {
+                    if (permission.indexOf("del") >= 0) {
+                        $("#delBtn").attr("disabled", false);
+                    }
+                    /*if (permission.indexOf("move") >= 0) {
                         $("#moveBtn").attr("disabled", false);
                     }
                     if (permission.indexOf("copy") >= 0) {
                         $("#copyBtn").attr("disabled", false);
                     }
-                    if (permission.indexOf("del") >= 0) {
-                        $("#delBtn").attr("disabled", false);
-                    }
                     if (permission.indexOf("changeName") >= 0) {
                         $("#changeNameBtn").attr("disabled", false);
-                    }
-                    if (permission.indexOf("upload") >= 0) {
-                        $("#uploadBtn").attr("disabled", false);
-                    }
-                    if (canMkDir) {
-                        $("#newDirBtn").attr("disabled", false);
-                    }
+                    }*/
                 }
             });
             $(this).dblclick(function () {
@@ -324,12 +319,20 @@
 
     function disabledAllBtn() {
         $("#downBtn").attr("disabled", true);
-        $("#moveBtn").attr("disabled", true);
-        $("#copyBtn").attr("disabled", true);
         $("#delBtn").attr("disabled", true);
-        $("#changeNameBtn").attr("disabled", true);
-        $("#uploadBtn").attr("disabled", true);
-        $("#newDirBtn").attr("disabled", true);
+       /* $("#moveBtn").attr("disabled", true);
+        $("#copyBtn").attr("disabled", true);
+        $("#changeNameBtn").attr("disabled", true);*/
+        if (canUpload) {
+            $("#uploadBtn").attr("disabled", false);
+        } else {
+            $("#uploadBtn").attr("disabled", true);
+        }
+        if (canMkDir) {
+            $("#newDirBtn").attr("disabled", false);
+        } else {
+            $("#newDirBtn").attr("disabled", true);
+        }
     }
 
     function initOrgTree() {
@@ -454,6 +457,11 @@
             canMkDir = true;
         } else {
             canMkDir = false;
+        }
+        if (parentPermission != undefined && parentPermission != null && parentPermission.indexOf("upload") >= 0) {
+            canUpload = true;
+        } else {
+            canUpload = false;
         }
         $(".template").remove();
         loadFile(pId);
