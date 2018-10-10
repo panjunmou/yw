@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -203,5 +205,18 @@ public class SysAttactmentController extends BaseController {
             resultMessage.setMessage(e.getMessage());
         }
         return resultMessage;
+    }
+
+    /**
+     * 下载
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    @RequestMapping("/download")
+    @ResponseBody
+    public void doDownloadFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("WebUploaderController.doDownloadFile");
+        this.attachmentService.downFile(request,response);
     }
 }

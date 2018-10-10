@@ -297,6 +297,6 @@ public class WebUploaderController extends BaseController {
     @ResponseBody
     public void doDownloadFile(HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
         System.out.println("WebUploaderController.doDownloadFile");
-//        CommonUtils.doDownloadFileDeal(getFileStorePath(), attachmentService, request, response, id);
+        CommonUtils.doDownloadFileDeal(getFileStorePath(), attachmentService, request, response, id);
     }
 }

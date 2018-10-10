@@ -5,12 +5,8 @@ import com.bootdo.common.dao.SysAttachmentDao;
 import com.bootdo.common.dao.SysAttachmentMapper;
 import com.bootdo.common.dao.SysAttachmentRoleDao;
 import com.bootdo.common.domain.SysAttachment;
-import com.bootdo.common.domain.SysAttachmentRole;
-import com.bootdo.common.enums.FileRoleEnums;
 import com.bootdo.common.service.SysAttachmentService;
-import com.bootdo.common.utils.BeanMapper;
-import com.bootdo.common.utils.ShiroUtils;
-import com.bootdo.common.utils.StringUtil;
+import com.bootdo.common.utils.*;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.BootStrapTreeViewVoState;
 import com.bootdo.common.vo.SysAttachmentVO;
@@ -20,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -493,16 +491,20 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         sysAttachmentDao.save(attachment);
         attachment.setPath(parent == null ? attachment.getId().toString() : (parent.getPath() + "." + attachment.getId()));
         sysAttachmentDao.save(attachment);
-        //赋予权限
-        SysAttachmentRole sysAttachmentRole = new SysAttachmentRole();
-        sysAttachmentRole.setAttactmentId(attachment.getId());
-        sysAttachmentRole.setRelationId(ShiroUtils.getUserId());
-        sysAttachmentRole.setType("person");
-        sysAttachmentRole.setPermission(FileRoleEnums.getValueStr());
-        sysAttachmentRoleDao.save(sysAttachmentRole);
 
         //创建文件夹
         File file = new File(realPath);
         file.mkdir();
+    }
+
+    @Override
+    public void downFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        String id = (String) paraMap.get("id");
+        SysAttachment attachment = sysAttachmentDao.findById(Long.parseLong(id)).get();
+        String persistedFileName = attachment.getPersistedFileName();
+        String originalFullName = attachment.getOriginalFullName();
+        String fullPath = bootdoConfig.getAttachBasePath() + persistedFileName;
+        CommonUtils.downLoadFile(request, response, fullPath, originalFullName);
     }
 }

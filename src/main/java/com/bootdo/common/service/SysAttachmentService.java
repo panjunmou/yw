@@ -4,6 +4,8 @@ import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.vo.SysAttachmentVO;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -42,4 +44,6 @@ public interface SysAttachmentService {
     List<BootStrapTreeViewVo> getPersonTree(Map<String, Object> queryParamMap);
 
     void mkDir(Map<String, Object> paraMap);
+
+    void downFile(HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

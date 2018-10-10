@@ -35,7 +35,8 @@
                                 disabled="disabled">
                             <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新建文件夹
                         </button>&nbsp;&nbsp;
-                        <button type="button" id="downBtn" class="btn btn-info" onclick="" disabled="disabled">
+                        <button type="button" id="downBtn" class="btn btn-info" onclick="download()"
+                                disabled="disabled">
                             <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
                         </button>&nbsp;&nbsp;
                         <!--<button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
@@ -47,7 +48,7 @@
                         <button type="button" id="changeNameBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
                         </button>&nbsp;&nbsp;-->
-                        <button type="button" id="delBtn" class="btn btn-danger" onclick="" disabled="disabled">
+                        <button type="button" id="delBtn" class="btn btn-danger" onclick="del()" disabled="disabled">
                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> 删除
                         </button>&nbsp;&nbsp;
                         <button type="button" id="roleBtn" class="btn btn-warning" onclick="roleSet()">
@@ -320,9 +321,9 @@
     function disabledAllBtn() {
         $("#downBtn").attr("disabled", true);
         $("#delBtn").attr("disabled", true);
-       /* $("#moveBtn").attr("disabled", true);
-        $("#copyBtn").attr("disabled", true);
-        $("#changeNameBtn").attr("disabled", true);*/
+        /* $("#moveBtn").attr("disabled", true);
+         $("#copyBtn").attr("disabled", true);
+         $("#changeNameBtn").attr("disabled", true);*/
         if (canUpload) {
             $("#uploadBtn").attr("disabled", false);
         } else {
@@ -466,6 +467,40 @@
         $(".template").remove();
         loadFile(pId);
     }
+
+    function del() {
+        var checkedDiv = $("#fileDiv div[data-show='yes']");
+        if (checkedDiv.length == 0 || checkedDiv.length > 1) {
+            layer.alert(
+                '请只选择一个文件',
+                {
+                    title: '提示',
+                    time: 0,//不自动关闭,
+                    icon: 2
+                }
+            );
+            return;
+        }
+    }
+
+    function download() {
+        var checkedDiv = $("#fileDiv div[data-show='yes']");
+        if (checkedDiv.length == 0) {
+            layer.alert(
+                '请至少选择一个文件',
+                {
+                    title: '提示',
+                    time: 0,//不自动关闭,
+                    icon: 2
+                }
+            );
+            return;
+        }
+        var id = checkedDiv.attr("id");
+
+        window.location.href = 'attactment/download?id=' + id;
+    }
+
 </script>
 
 </body>
