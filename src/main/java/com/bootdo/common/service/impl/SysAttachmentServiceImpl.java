@@ -12,6 +12,8 @@ import com.bootdo.common.vo.BootStrapTreeViewVoState;
 import com.bootdo.common.vo.SysAttachmentVO;
 import com.bootdo.system.dao.RoleDao;
 import com.bootdo.system.domain.RoleDO;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -506,5 +508,32 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         String originalFullName = attachment.getOriginalFullName();
         String fullPath = bootdoConfig.getAttachBasePath() + persistedFileName;
         CommonUtils.downLoadFile(request, response, fullPath, originalFullName);
+    }
+
+    @Override
+    public void del(Map<String, Object> paraMap) throws IOException {
+        String ids = (String) paraMap.get("ids");
+        if (StringUtils.isNotEmpty(ids)) {
+            String[] split = ids.split(",");
+            List<Long> idList = new ArrayList<>();
+            for (String id : split) {
+                idList.add(Long.parseLong(id));
+            }
+            //删除数据库
+            Iterable<SysAttachment> sysAttachments = this.sysAttachmentDao.findAllById(idList);
+            sysAttachmentDao.deleteAll(sysAttachments);
+            //删除权限
+            sysAttachmentRoleDao.deleteByAttactmentIdIn(idList);
+            //删除文件
+            for (SysAttachment sysAttachment : sysAttachments) {
+                Integer isDirectory = sysAttachment.getIsDirectory();
+                String filePath = bootdoConfig.getAttachBasePath() + sysAttachment.getPersistedFileName();
+                if (isDirectory == 1) {
+                    FileUtils.deleteDirectory(new File(filePath));
+                }else{
+                    FileUtil.deleteFile(filePath);
+                }
+            }
+        }
     }
 }

@@ -46,4 +46,6 @@ public interface SysAttachmentService {
     void mkDir(Map<String, Object> paraMap);
 
     void downFile(HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    void del(Map<String, Object> paraMap) throws IOException;
 }

@@ -117,6 +117,23 @@ public class SysAttactmentController extends BaseController {
      * @return
      * @throws Exception
      */
+    @RequestMapping("/getById")
+    @ResponseBody
+    public ResultMessage getById(HttpServletRequest request) throws Exception {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        queryParamMap.get()
+        SysAttachment attachment = attachmentService.getById(queryParamMap);
+        resultMessage.setData(list);
+        return resultMessage;
+    }
+
+    /**
+     * 获取文件树
+     *
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/getAttTree")
     @ResponseBody
     public ResultMessage getAttTree(HttpServletRequest request) throws Exception {
@@ -199,6 +216,22 @@ public class SysAttactmentController extends BaseController {
         try {
             this.attachmentService.mkDir(paraMap);
             resultMessage.setMessage("新建成功");
+        } catch (Exception e) {
+            resultMessage.setResult(ResultMessage.Error);
+            logger.error(e.getMessage());
+            resultMessage.setMessage(e.getMessage());
+        }
+        return resultMessage;
+    }
+
+    @RequestMapping("/del")
+    @ResponseBody
+    public ResultMessage del(HttpServletRequest request) throws Exception {
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        ResultMessage resultMessage = new ResultMessage();
+        try {
+            this.attachmentService.del(paraMap);
+            resultMessage.setMessage("删除成功");
         } catch (Exception e) {
             resultMessage.setResult(ResultMessage.Error);
             logger.error(e.getMessage());

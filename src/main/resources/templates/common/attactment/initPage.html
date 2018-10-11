@@ -438,6 +438,9 @@
                         if (data.result == 1) {
                             layer.msg("新建成功");
                             layer.close(index);
+                        }else{
+                            layer.msg("新建失败");
+                            layer.close(index);
                         }
                         $("#dirName").val('');
                         reloadFile(parentId);
@@ -454,6 +457,8 @@
     function reloadFile(pId) {
         parentId = pId;
         var parentPermission = $("#" + pId).attr("permission");
+        console.log(pId);
+        console.log(parentPermission);
         if (parentPermission != undefined && parentPermission != null && parentPermission.indexOf("mkdir") >= 0) {
             canMkDir = true;
         } else {
@@ -470,9 +475,9 @@
 
     function del() {
         var checkedDiv = $("#fileDiv div[data-show='yes']");
-        if (checkedDiv.length == 0 || checkedDiv.length > 1) {
+        if (checkedDiv.length == 0) {
             layer.alert(
-                '请只选择一个文件',
+                '请至少选择一个文件',
                 {
                     title: '提示',
                     time: 0,//不自动关闭,
@@ -481,6 +486,25 @@
             );
             return;
         }
+        var ids = '';
+        $.each(checkedDiv, function (i, v) {
+            var id = $(v).attr("id");
+            ids += id + ",";
+        });
+        $.ajaxExt({
+            url: "attactment/del",
+            data: {
+                ids: ids
+            },
+            success: function (data) {
+                if (data.result == 1) {
+                    layer.msg("删除成功");
+                }else{
+                    layer.msg("删除失败");
+                }
+                reloadFile(parentId);
+            }
+        });
     }
 
     function download() {
@@ -497,7 +521,6 @@
             return;
         }
         var id = checkedDiv.attr("id");
-
         window.location.href = 'attactment/download?id=' + id;
     }
 
