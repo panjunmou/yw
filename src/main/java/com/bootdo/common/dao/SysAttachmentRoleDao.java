@@ -16,4 +16,7 @@ public interface SysAttachmentRoleDao extends PagingAndSortingRepository<SysAtta
 
     @Modifying
     int deleteByAttactmentIdIn(List<Long> attactmentIdList);
+
+    @Modifying
+    int deleteByAttactmentId(Long attactmentId);
 }

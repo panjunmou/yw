@@ -146,7 +146,7 @@
     function loadFile(pId) {
         if (pId == undefined || pId == null || pId == '') {
             pId = "0";
-        }else{
+        } else {
             disabledAllBtn();
         }
         parentId = pId;
@@ -483,19 +483,26 @@
             var id = $(v).attr("id");
             ids += id + ",";
         });
-        $.ajaxExt({
-            url: "attactment/del",
-            data: {
-                ids: ids
-            },
-            success: function (data) {
-                if (data.result == 1) {
-                    layer.msg("删除成功");
-                } else {
-                    layer.msg("删除失败");
+        layer.confirm("确认要删除选中的'" + checkedDiv.length + "'条数据吗?", {
+            btn: ['确定', '取消']
+            // 按钮
+        }, function () {
+            $.ajaxExt({
+                url: "attactment/del",
+                data: {
+                    ids: ids
+                },
+                showWaitting: true,
+                success: function (data) {
+                    if (data.result == 1) {
+                        layer.msg("删除成功");
+                    } else {
+                        layer.msg("删除失败");
+                    }
+                    reloadFile(parentId);
                 }
-                reloadFile(parentId);
-            }
+            });
+        }, function () {
         });
     }
 

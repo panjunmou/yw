@@ -23,4 +23,7 @@ public interface SysAttachmentDao extends PagingAndSortingRepository<SysAttachme
     List<SysAttachment> findByParentId(Long parentId);
 
     SysAttachment findByPersistedFileName(String persistedFileName);
+
+    @Query("select u from SysAttachment u where u.path like ?1%")
+    List<SysAttachment> findByPathReg(String path);
 }

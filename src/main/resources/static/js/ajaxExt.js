@@ -13,7 +13,7 @@ $.ajaxExt = function (opts) {
         beforeSend: function (xhr, settings) {
             if (opts.showWaitting) {
                 $.blockUI({
-                    message: '<span class="post-loading">processing...</span>',
+                    message: '<span class="post-loading">努力加载中...</span>',
                     css: {
                         width: '200px',
                         border: 'none',

@@ -522,18 +522,31 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
             for (String id : split) {
                 idList.add(Long.parseLong(id));
             }
-            //删除数据库
             Iterable<SysAttachment> sysAttachments = this.sysAttachmentDao.findAllById(idList);
-            sysAttachmentDao.deleteAll(sysAttachments);
-            //删除权限
-            sysAttachmentRoleDao.deleteByAttactmentIdIn(idList);
-            //删除文件
             for (SysAttachment sysAttachment : sysAttachments) {
                 Integer isDirectory = sysAttachment.getIsDirectory();
                 String filePath = bootdoConfig.getAttachBasePath() + sysAttachment.getPersistedFileName();
                 if (isDirectory == 1) {
+                    //删除数据库(包括该文件夹以及以下的所有文件)
+                    String path = sysAttachment.getPath();
+                    //删除权限
+                    List<SysAttachment> pathReg = sysAttachmentDao.findByPathReg(path);
+                    if (pathReg != null) {
+                        List<Long> attIdList = new ArrayList<>();
+                        for (int i = 0; i < pathReg.size(); i++) {
+                            SysAttachment attachment = pathReg.get(i);
+                            attIdList.add(attachment.getId());
+                            sysAttachmentDao.delete(attachment);
+                        }
+                        sysAttachmentRoleDao.deleteByAttactmentIdIn(attIdList);
+                    }
+                    //删除文件
                     FileUtils.deleteDirectory(new File(filePath));
                 }else{
+                    sysAttachmentRoleDao.deleteByAttactmentId(sysAttachment.getId());
+                    //直接删除数据库文件
+                    sysAttachmentDao.delete(sysAttachment);
+                    //删除文件
                     FileUtil.deleteFile(filePath);
                 }
             }
