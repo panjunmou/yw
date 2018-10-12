@@ -4,7 +4,25 @@
 <mapper namespace="com.bootdo.common.dao.SysAttachmentMapper">
 
     <select id="get" resultType="com.bootdo.common.domain.SysAttachment">
-		select `id`,`file_ext`,`file_md5`,`file_size`,`original_full_name`,`original_file_name`,`persisted_file_name`,`parent_id`,`path`,`is_directory`,`create_id`,`create_name`,`create_date`,`update_date`,`update_name`,`update_id` from sys_attachment where id = #{value}
+		select
+		sa.`id`,
+		sa.`file_ext`,
+		sa.`file_md5`,
+		sa.`file_size`,
+		sa.`original_full_name`,
+		sa.`original_file_name`,
+		sa.`persisted_file_name`,
+		sa.`parent_id`,
+		sa.`path`,
+		sa.`is_directory`,
+		sa.`create_id`,
+		sa.`create_name`,
+		sa.`create_date`,
+		sa.`update_date`,
+		sa.`update_name`,
+		sa.`update_id`
+		from sys_attachment sa
+		where sa.id = #{value}
 	</select>
 
     <select id="list" resultType="com.bootdo.common.domain.SysAttachment">

@@ -198,8 +198,11 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     @Override
     public SysAttachmentVO getById(Long id) {
         SysAttachmentVO vo = new SysAttachmentVO();
-        SysAttachment attachment = sysAttachmentDao.findById(id).get();
-        BeanUtils.copyProperties(attachment, vo);
+        Optional<SysAttachment> attachmentOptional = sysAttachmentDao.findById(id);
+        if (attachmentOptional.isPresent()) {
+            SysAttachment attachment = attachmentOptional.get();
+            BeanUtils.copyProperties(attachment, vo);
+        }
         return vo;
     }
 

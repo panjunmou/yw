@@ -122,9 +122,9 @@ public class SysAttactmentController extends BaseController {
     public ResultMessage getById(HttpServletRequest request) throws Exception {
         ResultMessage resultMessage = new ResultMessage();
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        queryParamMap.get()
-        SysAttachment attachment = attachmentService.getById(queryParamMap);
-        resultMessage.setData(list);
+        String id = (String) queryParamMap.get("id");
+        SysAttachmentVO attachmentVO = attachmentService.getById(Long.parseLong(id));
+        resultMessage.setData(attachmentVO);
         return resultMessage;
     }
 
