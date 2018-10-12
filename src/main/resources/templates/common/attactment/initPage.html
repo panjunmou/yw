@@ -343,8 +343,7 @@
 
     function initOrgTree() {
         $.ajaxExt({
-            // url: "attactment/getAttTree",
-            url: "attactment/getPersonTree",
+            url: "attactment/listTree",
             type: 'GET',
             data: {
                 containsFile: '0'//不包含文件
@@ -372,8 +371,7 @@
     function loadData(node, func) {
         //这个技巧真高，即能得到节点数据，又能把节点下级的数据通过函数发回去
         $.ajaxExt({
-            url: "attactment/getByPersionParentId",
-            // url: "attactment/getAttByParentId",
+            url: "attactment/listTree",
             data: {
                 containsFile: '0',//不包含文件
                 parentId: node.id

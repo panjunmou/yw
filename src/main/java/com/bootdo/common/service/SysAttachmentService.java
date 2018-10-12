@@ -13,6 +13,8 @@ import java.util.Map;
 public interface SysAttachmentService {
     List<SysAttachmentVO> listFlie(Map<String, Object> queryParamMap) throws Exception;
 
+    List<BootStrapTreeViewVo> listTree(Map<String, Object> queryParamMap) throws Exception;
+
     boolean isSysManager();
 
     SysAttachmentVO addAttachment(String newPath, SysAttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException;

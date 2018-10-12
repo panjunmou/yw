@@ -91,6 +91,28 @@ public class SysAttactmentController extends BaseController {
     }
 
     /**
+     * 查询数据
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping("/listTree")
+    @ResponseBody
+    public ResultMessage listTree(HttpServletRequest request) {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+        try {
+            List<BootStrapTreeViewVo> bootStrapTreeViewVos = attachmentService.listTree(queryParamMap);
+            resultMessage.setData(bootStrapTreeViewVos);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            resultMessage.setResult(ResultMessage.Error);
+            resultMessage.setMessage("listFile Error");
+        }
+        return resultMessage;
+    }
+
+    /**
      * 初始化数据
      *
      * @param request

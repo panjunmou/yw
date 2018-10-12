@@ -120,6 +120,48 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
+    public List<BootStrapTreeViewVo> listTree(Map<String, Object> queryParamMap) throws Exception {
+        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
+        List<SysAttachmentVO> sysAttachmentList = this.listFlie(queryParamMap);
+        List<BootStrapTreeViewVo> list = new ArrayList<BootStrapTreeViewVo>();
+        if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
+            for (int i = 0; i < sysAttachmentList.size(); i++) {
+                SysAttachment sysAttachment = sysAttachmentList.get(i);
+                Integer isDirectory = sysAttachment.getIsDirectory();
+                BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
+                bootStrapTreeViewVo.setId(sysAttachment.getId().toString());
+                bootStrapTreeViewVo.setText(sysAttachment.getOriginalFullName());
+                if (isDirectory == 1) {
+                    //是文件夹
+                    bootStrapTreeViewVo.setLazyLoad(true);
+                } else {
+                    //是文件
+                    //不要包含文件,跳过
+                    continue;
+                }
+                BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
+                bootStrapTreeViewVo.setParentId(sysAttachment.getParentId().toString());
+                state.setExpanded(false);
+                bootStrapTreeViewVo.setState(state);
+                list.add(bootStrapTreeViewVo);
+            }
+        }
+        if (parentId.equals("0")) {
+            BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
+            bootStrapTreeViewVo.setId("0");
+            bootStrapTreeViewVo.setText("上海尧伟建设");
+            BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
+            bootStrapTreeViewVo.setParentId(null);
+            state.setExpanded(true);
+            bootStrapTreeViewVo.setState(state);
+            list.add(bootStrapTreeViewVo);
+            List<BootStrapTreeViewVo> bootStrapTreeViewVos = BootStrapTreeViewVo.listToTree(list);
+            return bootStrapTreeViewVos;
+        }
+        return list;
+    }
+
+    @Override
     public boolean isSysManager() {
         Map<String, Object> roleMap = new HashMap<>();
         roleMap.put("userId", ShiroUtils.getUserId());
@@ -542,7 +584,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
                     }
                     //删除文件
                     FileUtils.deleteDirectory(new File(filePath));
-                }else{
+                } else {
                     sysAttachmentRoleDao.deleteByAttactmentId(sysAttachment.getId());
                     //直接删除数据库文件
                     sysAttachmentDao.delete(sysAttachment);
