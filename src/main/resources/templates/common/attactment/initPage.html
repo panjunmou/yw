@@ -26,7 +26,7 @@
         <div class="col-sm-9">
             <div id="right-content" class="right-content">
                 <div class="zuijinTop">
-                    <div style="margin-top: 12px;display: none" id="btns">
+                    <div style="margin-top: 12px;" id="btns">
                         <button type="button" id="uploadBtn" class="btn btn-primary" onclick="upload()"
                                 disabled="disabled">
                             <i class="glyphicon glyphicon-upload" aria-hidden="true"></i> 上传文件
@@ -119,6 +119,7 @@
     };
     var parentId;
     var parentAttArr = {};
+    var isManager = [[${isManager}]];
     $(function () {
         //组织机构树
         initOrgTree();
@@ -141,20 +142,32 @@
             }
         });
 
+        if (isManager) {
+            $("#roleBtn").show();
+        }else{
+            $("#roleBtn").hide();
+        }
+
     });
 
     function loadFile(pId) {
         if (pId == undefined || pId == null || pId == '') {
             pId = "0";
-        } else {
+        }
+        if (isManager) {
+            $("#downBtn").attr("disabled", false);
+            $("#delBtn").attr("disabled", false);
+            $("#newDirBtn").attr("disabled", false);
+            $("#uploadBtn").attr("disabled", false);
+        } else if(pId != '0'){
             disabledAllBtn();
         }
         parentId = pId;
-        if (parentId == '0') {
-            $("#btns").hide();
-        } else {
-            $("#btns").show();
-        }
+        /* if (parentId == '0') {
+             $("#btns").hide();
+         } else {
+             $("#btns").show();
+         }*/
         $.ajaxExt({
             url: 'attactment/listFile',
             type: 'GET',
@@ -336,6 +349,7 @@
         }
         $("#downBtn").attr("disabled", true);
         $("#delBtn").attr("disabled", true);
+
         /* $("#moveBtn").attr("disabled", true);
          $("#copyBtn").attr("disabled", true);
          $("#changeNameBtn").attr("disabled", true);*/
