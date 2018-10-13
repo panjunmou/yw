@@ -340,150 +340,6 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
-    public List<BootStrapTreeViewVo> getAttachmentTree(Map<String, Object> queryParamMap) {
-        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
-        List<BootStrapTreeViewVo> list = getByParentId(queryParamMap);
-        if (parentId.equals("0")) {
-            BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
-            bootStrapTreeViewVo.setId("0");
-            bootStrapTreeViewVo.setText("上海尧伟建设");
-//        bootStrapTreeViewVo.setIcon("glyphicon glyphicon-folder-open");
-            BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
-            bootStrapTreeViewVo.setParentId(null);
-            state.setExpanded(true);
-            bootStrapTreeViewVo.setState(state);
-            list.add(bootStrapTreeViewVo);
-        }
-
-        List<BootStrapTreeViewVo> bootStrapTreeViewVos = BootStrapTreeViewVo.listToTree(list);
-        return bootStrapTreeViewVos;
-    }
-
-    @Override
-    public List<BootStrapTreeViewVo> getPersonTree(Map<String, Object> queryParamMap) {
-        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
-        boolean sysManager = isSysManager();
-        List<BootStrapTreeViewVo> list;
-        if (sysManager) {
-            return this.getAttachmentTree(queryParamMap);
-        } else {
-            list = getByPersionParentId(queryParamMap);
-        }
-        if (parentId.equals("0")) {
-            BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
-            bootStrapTreeViewVo.setId("0");
-            bootStrapTreeViewVo.setText("上海尧伟建设");
-            BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
-            state.setExpanded(true);
-            bootStrapTreeViewVo.setParentId(null);
-            bootStrapTreeViewVo.setState(state);
-            list.add(bootStrapTreeViewVo);
-        }
-        List<BootStrapTreeViewVo> bootStrapTreeViewVos = BootStrapTreeViewVo.listToTree(list);
-        return bootStrapTreeViewVos;
-    }
-
-    @Override
-    public List<BootStrapTreeViewVo> getByPersionParentId(Map<String, Object> queryParamMap) {
-        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
-        String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
-        queryParamMap.put("userId", ShiroUtils.getUserId());
-        queryParamMap.put("parentId", parentId);
-        boolean sysManager = isSysManager();
-        List<SysAttachmentVO> sysAttachmentList;
-        if (sysManager) {
-            return this.getByParentId(queryParamMap);
-        } else {
-            sysAttachmentList = sysAttachmentMapper.getByPersonParentId(queryParamMap);
-        }
-        List<BootStrapTreeViewVo> list = new ArrayList<BootStrapTreeViewVo>();
-        if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
-            Map<Long, SysAttachmentVO> sysAttachmentVOMap = new HashMap<>();
-            for (int i = 0; i < sysAttachmentList.size(); i++) {
-                SysAttachmentVO sysAttachmentVO = sysAttachmentList.get(i);
-                Long id = sysAttachmentVO.getId();
-                SysAttachmentVO attachmentVO = sysAttachmentVOMap.get(id);
-                if (attachmentVO == null) {
-                    sysAttachmentVOMap.put(id, sysAttachmentVO);
-                } else {
-                    Integer level = attachmentVO.getLevel();
-                    Integer voLevel = sysAttachmentVO.getLevel();
-                    if (voLevel > level) {
-                        sysAttachmentVOMap.put(id, sysAttachmentVO);
-                    } else {
-                        String permission = attachmentVO.getPermission();
-                        String voPermission = sysAttachmentVO.getPermission();
-                        if (voPermission.length() > permission.length()) {
-                            sysAttachmentVOMap.put(id, sysAttachmentVO);
-                        }
-                    }
-                }
-            }
-            for (SysAttachmentVO sysAttachmentVO : sysAttachmentVOMap.values()) {
-                Integer isDirectory = sysAttachmentVO.getIsDirectory();
-                BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
-                bootStrapTreeViewVo.setText(sysAttachmentVO.getOriginalFullName());
-                bootStrapTreeViewVo.setId(sysAttachmentVO.getId().toString());
-                if (isDirectory == 1) {
-                    //是文件夹
-//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-folder-close");
-                    bootStrapTreeViewVo.setLazyLoad(true);
-                } else {
-//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-file");
-                    //是文件
-                    if (containsFile.equals("0")) {
-                        //不要包含文件,跳过
-                        continue;
-                    }
-                    bootStrapTreeViewVo.setLazyLoad(false);
-                }
-                BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
-                bootStrapTreeViewVo.setParentId(sysAttachmentVO.getParentId().toString());
-                state.setExpanded(false);
-                bootStrapTreeViewVo.setState(state);
-                list.add(bootStrapTreeViewVo);
-            }
-        }
-        return list;
-    }
-
-    @Override
-    public List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap) {
-        String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
-        String containsFile = queryParamMap.get("containsFile") == null ? "0" : (String) queryParamMap.get("containsFile");
-        List<SysAttachment> sysAttachmentList = sysAttachmentDao.findByParentId(Long.parseLong(parentId));
-        List<BootStrapTreeViewVo> list = new ArrayList<BootStrapTreeViewVo>();
-        if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
-            for (int i = 0; i < sysAttachmentList.size(); i++) {
-                SysAttachment sysAttachment = sysAttachmentList.get(i);
-                Integer isDirectory = sysAttachment.getIsDirectory();
-                BootStrapTreeViewVo bootStrapTreeViewVo = new BootStrapTreeViewVo();
-                bootStrapTreeViewVo.setId(sysAttachment.getId().toString());
-                bootStrapTreeViewVo.setText(sysAttachment.getOriginalFullName());
-                if (isDirectory == 1) {
-                    //是文件夹
-//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-folder-close");
-                    bootStrapTreeViewVo.setLazyLoad(true);
-                } else {
-//                    bootStrapTreeViewVo.setIcon("glyphicon glyphicon-file");
-                    //是文件
-                    if (containsFile.equals("0")) {
-                        //不要包含文件,跳过
-                        continue;
-                    }
-                    bootStrapTreeViewVo.setLazyLoad(false);
-                }
-                BootStrapTreeViewVoState state = new BootStrapTreeViewVoState();
-                bootStrapTreeViewVo.setParentId(sysAttachment.getParentId().toString());
-                state.setExpanded(false);
-                bootStrapTreeViewVo.setState(state);
-                list.add(bootStrapTreeViewVo);
-            }
-        }
-        return list;
-    }
-
-    @Override
     public List<SysAttachment> getNavList(Map<String, Object> queryParamMap) {
         String parentId = (String) queryParamMap.get("parentId");
         List<SysAttachment> list = new ArrayList<>();
@@ -545,14 +401,64 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
-    public void downFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void downFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
         String id = (String) paraMap.get("id");
-        SysAttachment attachment = sysAttachmentDao.findById(Long.parseLong(id)).get();
-        String persistedFileName = attachment.getPersistedFileName();
-        String originalFullName = attachment.getOriginalFullName();
-        String fullPath = bootdoConfig.getAttachBasePath() + persistedFileName;
-        CommonUtils.downLoadFile(request, response, fullPath, originalFullName);
+        if (StringUtils.isNotEmpty(id)) {
+            SysAttachment attachment = sysAttachmentDao.findById(Long.parseLong(id)).get();
+            Integer isDirectory = attachment.getIsDirectory();
+            String persistedFileName = attachment.getPersistedFileName();
+            String originalFullName = attachment.getOriginalFullName();
+            String fullPath = bootdoConfig.getAttachBasePath() + persistedFileName;
+            if (isDirectory == 1) {
+                //文件夹
+                Calendar now = Calendar.getInstance();
+                int year = now.get(Calendar.YEAR);
+                int month = now.get(Calendar.MONTH) + 1;
+                int day = now.get(Calendar.DAY_OF_MONTH);
+                String zipTempPath = bootdoConfig.getAttachTempPath() + "/" + year + "/" + month + "/" + day;
+                File zipFile = new File(zipTempPath);
+                zipFile.mkdirs();
+                String zipRealPath = zipTempPath + "/" + UUID.randomUUID().toString() + ".zip";
+                ZipUtils.zip(zipRealPath, fullPath);
+                CommonUtils.downLoadFile(request, response, zipRealPath, originalFullName + ".zip");
+            } else {
+                //单个文件
+                CommonUtils.downLoadFile(request, response, fullPath, originalFullName);
+            }
+        } else {
+            //多个文件
+            String ids = (String) paraMap.get("ids");
+            if (StringUtils.isNotEmpty(ids)) {
+                String[] split = ids.split(",");
+                Long[] idArr = new Long[split.length];
+                for (int i = 0; i < split.length; i++) {
+                    idArr[i] = Long.parseLong(split[i]);
+                }
+                List<SysAttachment> sysAttachmentList = sysAttachmentDao.findByIdIn(idArr);
+                if (sysAttachmentList != null && !sysAttachmentList.isEmpty()) {
+                    List<String> fileList = new ArrayList<>();
+                    for (int i = 0; i < sysAttachmentList.size(); i++) {
+                        SysAttachment attachment = sysAttachmentList.get(i);
+                        String persistedFileName = attachment.getPersistedFileName();
+                        String fullPath = bootdoConfig.getAttachBasePath() + persistedFileName;
+                        fileList.add(fullPath);
+                    }
+                    Calendar now = Calendar.getInstance();
+                    int year = now.get(Calendar.YEAR);
+                    int month = now.get(Calendar.MONTH) + 1;
+                    int day = now.get(Calendar.DAY_OF_MONTH);
+                    String zipTempPath = bootdoConfig.getAttachTempPath() + "/" + year + "/" + month + "/" + day;
+                    File zipFile = new File(zipTempPath);
+                    zipFile.mkdirs();
+                    String zipRealPath = zipTempPath + "/" + UUID.randomUUID().toString() + ".zip";
+                    ZipUtils.zip(zipRealPath, fileList);
+                    Long parentId = sysAttachmentList.get(0).getParentId();
+                    SysAttachment attachment = sysAttachmentDao.findById(parentId).get();
+                    CommonUtils.downLoadFile(request, response, zipRealPath, attachment.getOriginalFileName() + ".zip");
+                }
+            }
+        }
     }
 
     @Override

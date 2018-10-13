@@ -33,21 +33,13 @@ public interface SysAttachmentService {
 
     void initFile(Map<String, Object> queryParamMap) throws Exception;
 
-    List<BootStrapTreeViewVo> getAttachmentTree(Map<String, Object> queryParamMap);
-
-    List<BootStrapTreeViewVo> getByPersionParentId(Map<String, Object> queryParamMap);
-
-    List<BootStrapTreeViewVo> getByParentId(Map<String, Object> queryParamMap);
-
     List<SysAttachment> getNavList(Map<String, Object> queryParamMap);
 
     SysAttachment getByPersistedFileName(String persistedFileName);
 
-    List<BootStrapTreeViewVo> getPersonTree(Map<String, Object> queryParamMap);
-
     void mkDir(Map<String, Object> paraMap);
 
-    void downFile(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void downFile(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     void del(Map<String, Object> paraMap) throws IOException;
 }

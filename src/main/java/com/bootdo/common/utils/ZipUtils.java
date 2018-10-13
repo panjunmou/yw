@@ -1,42 +1,32 @@
-package com.bootdo.testDemo;
-
-import org.junit.Test;
+package com.bootdo.common.utils;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class TestZip {
+public class ZipUtils {
 
-    @Test
-    public void testMkDir() {
+    public static void zip(String zipFileName, String sourceFileName) throws Exception {
+        System.out.println("压缩中...");
+
+        //创建zip输出流
+        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
+
+        //创建缓冲输出流
+        BufferedOutputStream bos = new BufferedOutputStream(out);
+
+        File sourceFile = new File(sourceFileName);
+
+        //调用函数
+        compress(out, bos, sourceFile, sourceFile.getName());
+        bos.close();
+        out.close();
+        System.out.println("压缩完成");
 
     }
 
-    @Test
-    public void testZip() {
-        try {
-            this.zip("D:\\share\\压缩.zip", "D:\\share\\售后服务部\\售后合同\\华北\\打包测试");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testZipList() {
-        try {
-            List<String> sourceFileNameList = new ArrayList<>();
-            sourceFileNameList.add("D:\\share\\售后服务部\\售后合同\\华北\\打包测试");
-            sourceFileNameList.add("D:\\share\\售后服务部\\售后合同\\华北\\1.gif");
-            this.zip("D:\\share\\压缩.zip", sourceFileNameList);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void zip(String zipFileName, List<String> sourceFileNameList) throws Exception {
+    public static void zip(String zipFileName, List<String> sourceFileNameList) throws Exception {
         System.out.println("压缩中...");
 
         //创建zip输出流
@@ -58,26 +48,8 @@ public class TestZip {
 
     }
 
-    public void zip(String zipFileName, String sourceFileName) throws Exception {
-        System.out.println("压缩中...");
 
-        //创建zip输出流
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
-
-        //创建缓冲输出流
-        BufferedOutputStream bos = new BufferedOutputStream(out);
-
-        File sourceFile = new File(sourceFileName);
-
-        //调用函数
-        compress(out, bos, sourceFile, sourceFile.getName());
-        bos.close();
-        out.close();
-        System.out.println("压缩完成");
-
-    }
-
-    public void compress(ZipOutputStream out, BufferedOutputStream bos, File sourceFile, String base) throws Exception {
+    public static void compress(ZipOutputStream out, BufferedOutputStream bos, File sourceFile, String base) throws Exception {
         //如果路径为目录（文件夹）
         if (sourceFile.isDirectory()) {
 

@@ -156,70 +156,6 @@ public class SysAttactmentController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping("/getAttTree")
-    @ResponseBody
-    public ResultMessage getAttTree(HttpServletRequest request) throws Exception {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        List<BootStrapTreeViewVo> list = attachmentService.getAttachmentTree(queryParamMap);
-        resultMessage.setData(list);
-        return resultMessage;
-    }
-
-    /**
-     * 获取文件树
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/getPersonTree")
-    @ResponseBody
-    public ResultMessage getPersonTree(HttpServletRequest request) throws Exception {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        List<BootStrapTreeViewVo> list = attachmentService.getPersonTree(queryParamMap);
-        resultMessage.setData(list);
-        return resultMessage;
-    }
-
-    /**
-     * 获取文件树
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/getAttByParentId")
-    @ResponseBody
-    public ResultMessage getAttByParentId(HttpServletRequest request) throws Exception {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        List<BootStrapTreeViewVo> list = attachmentService.getByParentId(queryParamMap);
-        resultMessage.setData(list);
-        return resultMessage;
-    }
-
-    /**
-     * 获取文件树
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping("/getByPersionParentId")
-    @ResponseBody
-    public ResultMessage getByPersionParentId(HttpServletRequest request) throws Exception {
-        ResultMessage resultMessage = new ResultMessage();
-        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-        List<BootStrapTreeViewVo> list = attachmentService.getByPersionParentId(queryParamMap);
-        resultMessage.setData(list);
-        return resultMessage;
-    }
-
-    /**
-     * 获取文件树
-     *
-     * @return
-     * @throws Exception
-     */
     @RequestMapping("/getNavList")
     @ResponseBody
     public ResultMessage getNavList(HttpServletRequest request) throws Exception {
@@ -270,8 +206,7 @@ public class SysAttactmentController extends BaseController {
      */
     @RequestMapping("/download")
     @ResponseBody
-    public void doDownloadFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        System.out.println("WebUploaderController.doDownloadFile");
+    public void doDownloadFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
         this.attachmentService.downFile(request,response);
     }
 }

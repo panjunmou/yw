@@ -144,7 +144,7 @@
 
         if (isManager) {
             $("#roleBtn").show();
-        }else{
+        } else {
             $("#roleBtn").hide();
         }
 
@@ -159,7 +159,7 @@
             $("#delBtn").attr("disabled", false);
             $("#newDirBtn").attr("disabled", false);
             $("#uploadBtn").attr("disabled", false);
-        } else if(pId != '0'){
+        } else if (pId != '0') {
             disabledAllBtn();
         }
         parentId = pId;
@@ -531,8 +531,17 @@
             );
             return;
         }
-        var id = checkedDiv.attr("id");
-        window.location.href = 'attactment/download?id=' + id;
+        if (checkedDiv.length == 1) {
+            var id = checkedDiv.attr("id");
+            window.location.href = 'attactment/download?id=' + id;
+        } else {
+            var ids = '';
+            $.each(checkedDiv, function (i, v) {
+                var id = $(v).attr("id");
+                ids += id + ",";
+            });
+            window.location.href = 'attactment/download?ids=' + ids;
+        }
     }
 
 </script>
