@@ -14,7 +14,6 @@
                     <div class="gg-nav">
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#basic_info" data-toggle="tab">基本资料</a></li>
-                            <li><a href="#photo_info" data-toggle="tab">头像修改</a></li>
                             <li><a href="#pwd_info" data-toggle="tab">修改密码</a></li>
                         </ul>
                     </div>
@@ -29,8 +28,8 @@
                                     <em class="gg-star">*</em>
                                     <span>姓名:</span>
                                 </div>
-                                <div class="gg-formDetail">
-                                    <input type="text" class="form-control" id="userName" name="name" th:value="${user.name}"  placeholder="请输入姓名" />
+                                <div class="gg-formDetail" th:text="${user.name}">
+                                    <!--<input type="text" class="form-control" id="userName" name="name" th:value="${user.name}"  placeholder="请输入姓名" />-->
                                 </div>
                             </div>
                             <div class="gg-formGroup">
@@ -103,7 +102,7 @@
                                     <input type="text" class="form-control" id="address" name="liveAddress" th:value="${user.liveAddress}" placeholder="请输入居住地址" />
                                 </div>
                             </div>
-                            <div class="gg-formGroup">
+                            <!--<div class="gg-formGroup">
                                 <div class="gg-formTitle">
                                     <em class="gg-star">*</em>
                                     <span>爱好:</span>
@@ -116,7 +115,7 @@
                                         </label>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                         </form>
                         <div class="gg-btnGroup">
                             <button type="button" class="btn btn-sm btn-primary" id="base_save">保存</button>
