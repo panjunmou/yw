@@ -154,15 +154,8 @@
         if (pId == undefined || pId == null || pId == '') {
             pId = "0";
         }
-        if (isManager) {
-            $("#downBtn").attr("disabled", false);
-            $("#delBtn").attr("disabled", false);
-            $("#newDirBtn").attr("disabled", false);
-            $("#uploadBtn").attr("disabled", false);
-        } else if (pId != '0') {
-            disabledAllBtn();
-        }
         parentId = pId;
+        disabledAllBtn();
         /* if (parentId == '0') {
              $("#btns").hide();
          } else {
@@ -305,6 +298,7 @@
                     $(this).find(".select").show();
                     //控制按钮权限
                     var permission = $(this).attr("permission");
+                    console.log(permission);
                     if (permission.indexOf("down") >= 0) {
                         $("#downBtn").attr("disabled", false);
                     }
@@ -333,7 +327,12 @@
     }
 
     function disabledAllBtn() {
-        if (parentId != '0') {
+        if (isManager) {
+            $("#downBtn").attr("disabled", false);
+            $("#delBtn").attr("disabled", false);
+            $("#newDirBtn").attr("disabled", false);
+            $("#uploadBtn").attr("disabled", false);
+        } else if (parentId != '0') {
             var parentAtt = parentAttArr[parentId];
             var parentPermission = parentAtt.permission;
             if (parentPermission != undefined && parentPermission != null && parentPermission.indexOf("mkdir") >= 0) {
@@ -346,10 +345,9 @@
             } else {
                 $("#uploadBtn").attr("disabled", true);
             }
+            $("#downBtn").attr("disabled", true);
+            $("#delBtn").attr("disabled", true);
         }
-        $("#downBtn").attr("disabled", true);
-        $("#delBtn").attr("disabled", true);
-
         /* $("#moveBtn").attr("disabled", true);
          $("#copyBtn").attr("disabled", true);
          $("#changeNameBtn").attr("disabled", true);*/

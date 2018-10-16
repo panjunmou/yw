@@ -14,6 +14,7 @@ import com.bootdo.system.dao.RoleDao;
 import com.bootdo.system.domain.RoleDO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.dozer.util.IteratorUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -293,9 +294,19 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      */
     @Override
     public void initFile(Map<String, Object> queryParamMap) throws Exception {
+        Iterator<SysAttachment> attachmentIterator = sysAttachmentDao.findAll().iterator();
+        List<SysAttachment> attachmentList = IteratorUtils.toList(attachmentIterator);
+        Map<String, SysAttachment> sysAttachmentMap = new HashMap<>();
+        if (attachmentList != null) {
+            for (int i = 0; i < attachmentList.size(); i++) {
+                SysAttachment attachment = attachmentList.get(i);
+                String persistedFileName = attachment.getPersistedFileName();
+                sysAttachmentMap.put(persistedFileName, attachment);
+            }
+        }
         String attachBasePath = bootdoConfig.getAttachBasePath();
         File fileDir = new File(attachBasePath);
-        regFile(fileDir, null);
+        regFile(fileDir, null,sysAttachmentMap);
     }
 
     /**
@@ -303,9 +314,10 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      *
      * @param fileDir
      * @param parent
+     * @param sysAttachmentMap
      * @throws Exception
      */
-    private void regFile(File fileDir, SysAttachment parent) throws Exception {
+    private void regFile(File fileDir, SysAttachment parent, Map<String, SysAttachment> sysAttachmentMap) throws Exception {
         if (fileDir.exists()) {
             File[] listFiles = fileDir.listFiles();
             for (File file : listFiles) {
@@ -325,14 +337,19 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
                     sysAttachment.setOriginalFileName(fileName);
                     sysAttachment.setFileExt(prefix);
                     sysAttachment.setIsDirectory(directory ? 1 : 0);
-                    sysAttachment.setPersistedFileName(canonicalPath.replace(bootdoConfig.getAttachBasePath(), ""));
+                    String persistedFileName = canonicalPath.replace(bootdoConfig.getAttachBasePath(), "");
+                    SysAttachment attachment = sysAttachmentMap.get(persistedFileName);
+                    if (attachment != null) {
+                        continue;
+                    }
+                    sysAttachment.setPersistedFileName(persistedFileName);
                     sysAttachment.setParentId(parent == null ? 0l : parent.getId());
                     sysAttachment.setFileSize(directory ? null : file.length());
                     sysAttachmentDao.save(sysAttachment);
                     sysAttachment.setPath(parent == null ? sysAttachment.getId().toString() : (parent.getPath() + "." + sysAttachment.getId()));
                     sysAttachmentDao.save(sysAttachment);
                     if (directory) {
-                        regFile(new File(canonicalPath), sysAttachment);
+                        regFile(new File(canonicalPath), sysAttachment, sysAttachmentMap);
                     }
                 }
             }
