@@ -24,7 +24,8 @@ function load() {
 						search : true, // 是否显示搜索框
 						showColumns : true, // 是否显示内容下拉框（选择显示的列）
 						sidePagination : "client", // 设置在哪里进行分页，可选值为"client" 或者
-						// "server"
+                        clickToSelect: true,
+                        // "server"
 						// queryParams : queryParams,
 						// //请求服务器数据时，你可以通过重写参数的方式添加一些额外的参数，例如 toolbar 中的参数 如果
 						// queryParamsType = 'limit' ,返回参数必须包含
