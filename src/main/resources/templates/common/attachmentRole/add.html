@@ -16,6 +16,7 @@
 <div class="container" style="width: 95%;">
     <div class="row">
         <form class="form-horizontal" id="roleForm" style="padding: 5px;">
+        <!--<form class="gg-form" role="form" id="roleForm" style="padding: 5px;">-->
             <input type="hidden" name="relationId"/>
             <input type="hidden" name="type" value="person"/>
             <input type="hidden" name="attactmentId" th:value="${id}"/>
@@ -38,7 +39,20 @@
                      </select>
                  </div>
              </div>-->
-            <div class="form-group" id="personDiv">
+            <!--<div class="gg-formGroup" id="personDiv">
+                <div class="gg-formTitle">
+                    <em class="gg-star">*</em>
+                    <span>选择人员:</span>
+                </div>
+                <div class="gg-formDetail">
+                    <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
+                            name="person" id="person" data-dropup-auto="false">
+                        <option value="">请选择...</option>
+                    </select>
+                    &lt;!&ndash;<input type="text" class="form-control" id="userName" name="name" th:value="${user.name}"  placeholder="请输入姓名" />&ndash;&gt;
+                </div>
+            </div>-->
+            <div class="form-group gg-formGroup" id="personDiv">
                 <label for="person" class="col-sm-2 control-label">选择人员:</label>
                 <div class="col-sm-10">
                     <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
@@ -116,8 +130,36 @@
 <script type="text/javascript" src="/js/plugins/bootstrap-iCheck/icheck.js"></script>
 <script type="text/javascript" src="/js/plugins/jquery.serializeObject.js"></script>
 
+<!--校验插件-->
+<script src="/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/js/plugins/validate/jquery.validate.extend.js"></script>
+<script src="/js/plugins/validate/messages_zh.min.js"></script>
+
 <script type="text/javascript" th:inline="javascript">
     $(function () {
+        $("#roleForm").validate({
+            errorElement: 'span',
+            errorClass: 'help-block error-mes',
+            rules: {
+                person: {
+                    required: true
+                }
+            },
+            errorPlacement: function (error, element) {
+            },
+            highlight: function (element) {
+                $(element).closest('.gg-formGroup').addClass('has-error has-feedback');
+            },
+            success: function (label) {
+                var el = label.closest('.gg-formGroup').find("input");
+                el.next().remove();
+                label.closest('.gg-formGroup').removeClass('has-error').addClass("has-feedback has-success");
+                label.remove();
+            },
+            submitHandler: function (form) {
+            }
+        });
+
         loadPerson();
         // loadDept();
         /*
@@ -183,6 +225,9 @@
     }
 
     function saveRole() {
+        if (!$("#roleForm").valid()) {
+            return false;
+        }
         var roleData = $("#roleForm").serializeObject();
         $.ajaxExt({
             url: "/common/attachmentRole/save",

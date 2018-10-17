@@ -30,7 +30,8 @@ function load(deptId) {
 				showColumns : false, // 是否显示内容下拉框（选择显示的列）
 				sidePagination : "server", // 设置在哪里进行分页，可选值为"client" 或者
 				// "server"
-				queryParams : function(params) {
+                clickToSelect: true,
+                queryParams : function(params) {
 					return {
 						// 说明：传入后台的参数包括offset开始索引，limit步长，sort排序列，order：desc或者,以及所有列的键值对
 						limit : params.limit,
