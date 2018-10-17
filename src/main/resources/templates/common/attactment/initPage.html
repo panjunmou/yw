@@ -281,6 +281,7 @@
     function bindMyClick() {
         $(".content .template").each(function () {
             $(this).click(function () {
+
                 if ($(this).attr("data-show") == "yes") {
                     //取消选中
                     //这是样式
@@ -297,15 +298,15 @@
                     $(this).attr("data-show", "yes");
                     $(this).find(".select").show();
                     //控制按钮权限
-                    var permission = $(this).attr("permission");
-                    console.log(permission);
+                    controlBtnPer();
+                    /*var permission = $(this).attr("permission");
                     if (permission.indexOf("down") >= 0) {
                         $("#downBtn").attr("disabled", false);
                     }
                     if (permission.indexOf("delete") >= 0) {
                         $("#delBtn").attr("disabled", false);
                     }
-                    /*if (permission.indexOf("move") >= 0) {
+                    if (permission.indexOf("move") >= 0) {
                         $("#moveBtn").attr("disabled", false);
                     }
                     if (permission.indexOf("copy") >= 0) {
@@ -333,6 +334,7 @@
             $("#newDirBtn").attr("disabled", false);
             $("#uploadBtn").attr("disabled", false);
         } else if (parentId != '0') {
+            //获取父级权限,设置"新建文件夹"和"上传"按钮是否可用
             var parentAtt = parentAttArr[parentId];
             var parentPermission = parentAtt.permission;
             if (parentPermission != undefined && parentPermission != null && parentPermission.indexOf("mkdir") >= 0) {
@@ -345,12 +347,49 @@
             } else {
                 $("#uploadBtn").attr("disabled", true);
             }
-            $("#downBtn").attr("disabled", true);
-            $("#delBtn").attr("disabled", true);
+            controlBtnPer();
         }
         /* $("#moveBtn").attr("disabled", true);
          $("#copyBtn").attr("disabled", true);
          $("#changeNameBtn").attr("disabled", true);*/
+    }
+
+    function controlBtnPer() {
+        //获取当前所有选中的文件夹,取权限交集
+        var permissionAll = ['view', 'down', 'delete'];
+        var checkedDiv = $("#fileDiv div[data-show='yes']");
+        if (checkedDiv.length == 0) {
+            $("#delBtn").attr("disabled", true);
+            $("#downBtn").attr("disabled", true);
+            return;
+        }
+        $.each(checkedDiv, function (i, v) {
+            var permissions = $(v).attr("permission");
+            var permissionArr = permissions.split(",");
+            permissionAll = permissionAll.filter(function (v) {
+                return permissionArr.indexOf(v) > -1
+            });
+        });
+        var downFlag = false;
+        var delFlag = false;
+        $.each(permissionAll, function (i, v) {
+            if (v == 'down') {
+                downFlag = true;
+            } else if (v == 'delete') {
+                delFlag = true;
+            }
+        });
+        if (delFlag) {
+            $("#delBtn").attr("disabled", false);
+        } else {
+            $("#delBtn").attr("disabled", true);
+        }
+
+        if (downFlag) {
+            $("#downBtn").attr("disabled", false);
+        } else {
+            $("#downBtn").attr("disabled", true);
+        }
     }
 
     function initOrgTree() {
