@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/css/style.css?v=4.1.0">
     <link rel="stylesheet" href="/css/attactment/attactment.css">
 </head>
+<!--oncontextmenu=self.event.returnValue=false onselectstart="return false"-->
 <body class="gray-bg">
 <div class="wrapper wrapper-content">
     <div class="row">
@@ -34,6 +35,10 @@
                         <button type="button" id="newDirBtn" class="btn btn-info" onclick="newDir()"
                                 disabled="disabled">
                             <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新建文件夹
+                        </button>&nbsp;&nbsp;
+                        <button type="button" id="readBtn" class="btn btn-info" onclick="readOnLine()"
+                                disabled="disabled">
+                            <i class="glyphicon glyphicon-eye-open" aria-hidden="true"></i> 在线预览
                         </button>&nbsp;&nbsp;
                         <button type="button" id="downBtn" class="btn btn-info" onclick="download()"
                                 disabled="disabled">
@@ -103,6 +108,9 @@
         </div>
     </div>
 </div>
+<div id="readOnLineDialog" style="display: none">
+    <img id="readOnLineImg" src=""/>
+</div>
 <!-- 全局js -->
 <script type="text/javascript" src="/js/jquery.min.js?v=2.1.4"></script>
 <script type="text/javascript" src="/js/bootstrap.min.js?v=3.3.6"></script>
@@ -120,6 +128,7 @@
     var parentId;
     var parentAttArr = {};
     var isManager = [[${isManager}]];
+    var isManager = [[${basePath}]];
     $(function () {
         //组织机构树
         initOrgTree();
@@ -176,13 +185,13 @@
                         var fileStr = "";
                         if (attachment.isDirectory == 1) {
                             fileStr +=
-                                '<div class="box template" data-show="no" permission="' + attachment.permission + '" id="' + attachment.id + '" isDirectory="1">\n';
+                                '<div class="box template" data-show="no" permission="' + attachment.permission + '" persistedFileName="' + attachment.persistedFileName + '" id="' + attachment.id + '" isDirectory="1">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/wenjian.png" class="myIcon" alt="">\n';
                         } else {
                             var picStr = getPic(attachment.fileExt);
                             fileStr +=
-                                '<div class="box2 template" data-show="no" permission="' + attachment.permission + '" id="' + attachment.id + '" isDirectory="0">\n';
+                                '<div class="box2 template" data-show="no" permission="' + attachment.permission + '" persistedFileName="' + attachment.persistedFileName + '" id="' + attachment.id + '" isDirectory="0">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/' + picStr + '" class="myIcon" alt="">\n';
                         }
@@ -332,6 +341,7 @@
             $("#downBtn").attr("disabled", false);
             $("#delBtn").attr("disabled", false);
             $("#newDirBtn").attr("disabled", false);
+            $("#readBtn").attr("disabled", false);
             $("#uploadBtn").attr("disabled", false);
         } else if (parentId != '0') {
             //获取父级权限,设置"新建文件夹"和"上传"按钮是否可用
@@ -349,46 +359,51 @@
             }
             controlBtnPer();
         }
-        /* $("#moveBtn").attr("disabled", true);
-         $("#copyBtn").attr("disabled", true);
-         $("#changeNameBtn").attr("disabled", true);*/
     }
 
     function controlBtnPer() {
-        //获取当前所有选中的文件夹,取权限交集
-        var permissionAll = ['view', 'down', 'delete'];
-        var checkedDiv = $("#fileDiv div[data-show='yes']");
-        if (checkedDiv.length == 0) {
-            $("#delBtn").attr("disabled", true);
-            $("#downBtn").attr("disabled", true);
-            return;
-        }
-        $.each(checkedDiv, function (i, v) {
-            var permissions = $(v).attr("permission");
-            var permissionArr = permissions.split(",");
-            permissionAll = permissionAll.filter(function (v) {
-                return permissionArr.indexOf(v) > -1
-            });
-        });
-        var downFlag = false;
-        var delFlag = false;
-        $.each(permissionAll, function (i, v) {
-            if (v == 'down') {
-                downFlag = true;
-            } else if (v == 'delete') {
-                delFlag = true;
-            }
-        });
-        if (delFlag) {
-            $("#delBtn").attr("disabled", false);
-        } else {
-            $("#delBtn").attr("disabled", true);
-        }
-
-        if (downFlag) {
+        if (isManager) {
             $("#downBtn").attr("disabled", false);
+            $("#delBtn").attr("disabled", false);
+            $("#newDirBtn").attr("disabled", false);
+            $("#readBtn").attr("disabled", false);
+            $("#uploadBtn").attr("disabled", false);
         } else {
-            $("#downBtn").attr("disabled", true);
+            //获取当前所有选中的文件夹,取权限交集
+            var permissionAll = ['view', 'down', 'delete'];
+            var checkedDiv = $("#fileDiv div[data-show='yes']");
+            if (checkedDiv.length == 0) {
+                $("#delBtn").attr("disabled", true);
+                $("#downBtn").attr("disabled", true);
+                return;
+            }
+            $.each(checkedDiv, function (i, v) {
+                var permissions = $(v).attr("permission");
+                var permissionArr = permissions.split(",");
+                permissionAll = permissionAll.filter(function (v) {
+                    return permissionArr.indexOf(v) > -1
+                });
+            });
+            var downFlag = false;
+            var delFlag = false;
+            $.each(permissionAll, function (i, v) {
+                if (v == 'down') {
+                    downFlag = true;
+                } else if (v == 'delete') {
+                    delFlag = true;
+                }
+            });
+            if (delFlag) {
+                $("#delBtn").attr("disabled", false);
+            } else {
+                $("#delBtn").attr("disabled", true);
+            }
+
+            if (downFlag) {
+                $("#downBtn").attr("disabled", false);
+            } else {
+                $("#downBtn").attr("disabled", true);
+            }
         }
     }
 
@@ -470,6 +485,30 @@
             // area: ['660px', '418px'],
             area: ['80%', '80%'],
             content: 'attachmentRole?id=' + id
+        });
+    }
+
+    function readOnLine() {
+        var checkedDiv = $("#fileDiv div[data-show='yes']");
+        if (checkedDiv.length == 0 || checkedDiv.length > 1) {
+            layer.alert(
+                '请只选择一个文件',
+                {
+                    title: '提示',
+                    time: 0,//不自动关闭,
+                    icon: 2
+                }
+            );
+            return;
+        }
+        var persistedFileName = checkedDiv.attr("persistedFileName");
+        $("#readOnLineImg").attr("src", "/imgPath/" + persistedFileName);
+        layer.open({
+            type: 1,
+            title: '在线预览',
+            area: ['80%', '80%'],
+            content: $("#readOnLineDialog"),
+            maxmin: true
         });
     }
 

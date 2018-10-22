@@ -204,7 +204,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         BeanUtils.copyProperties(vo, attachment);
         attachment = sysAttachmentDao.save(attachment);
         attachment.setPath(parentAtt == null ? attachment.getId().toString() : (parentAtt.getPath() + "." + attachment.getId()));
-        attachment.setParentId(parentAtt == null ? 0l : parentAtt.getId());
+        attachment.setParentId((parentAtt == null || parentAtt.getId() == null)? 0l : parentAtt.getId());
         attachment = sysAttachmentDao.save(attachment);
 
         SysAttachmentVO rvo = new SysAttachmentVO();

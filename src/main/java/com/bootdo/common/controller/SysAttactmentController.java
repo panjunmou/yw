@@ -1,5 +1,6 @@
 package com.bootdo.common.controller;
 
+import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.SysAttachmentService;
 import com.bootdo.common.utils.RequestUtil;
@@ -36,6 +37,9 @@ public class SysAttactmentController extends BaseController {
     @Resource
     private SysAttachmentService attachmentService;
 
+    @Resource
+    private BootdoConfig bootdoConfig;
+
     /**
      * 主页面
      *
@@ -49,6 +53,7 @@ public class SysAttactmentController extends BaseController {
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
         model.addAttribute("parentId", parentId);
         model.addAttribute("isManager", isManager);
+        model.addAttribute("basePath", bootdoConfig.getAttachBasePath());
         return "common/attactment/initPage";
     }
 
