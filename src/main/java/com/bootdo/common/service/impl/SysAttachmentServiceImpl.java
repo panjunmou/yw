@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dozer.util.IteratorUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -180,6 +181,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
+    @Transactional
     public SysAttachmentVO addAttachment(String newPath, SysAttachmentVO parentAtt, String oriFileName, String extName, Long size, String md5) throws IOException {
         File f1 = new File(newPath);
 //        File f2 = new File(attachPath);
@@ -204,7 +206,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         BeanUtils.copyProperties(vo, attachment);
         attachment = sysAttachmentDao.save(attachment);
         attachment.setPath(parentAtt == null ? attachment.getId().toString() : (parentAtt.getPath() + "." + attachment.getId()));
-        attachment.setParentId((parentAtt == null || parentAtt.getId() == null)? 0l : parentAtt.getId());
+        attachment.setParentId((parentAtt == null || parentAtt.getId() == null) ? 0l : parentAtt.getId());
         attachment = sysAttachmentDao.save(attachment);
 
         SysAttachmentVO rvo = new SysAttachmentVO();
@@ -216,6 +218,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * 添加附件
      */
     @Override
+    @Transactional
     public Long add(SysAttachmentVO vo) {
         SysAttachment attachment = new SysAttachment();
         BeanUtils.copyProperties(vo, attachment);
@@ -229,6 +232,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * @param id
      */
     @Override
+    @Transactional
     public void deleteById(Long id) {
         sysAttachmentDao.deleteById(id);
     }
@@ -293,6 +297,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * @param queryParamMap
      */
     @Override
+    @Transactional
     public void initFile(Map<String, Object> queryParamMap) throws Exception {
         Iterator<SysAttachment> attachmentIterator = sysAttachmentDao.findAll().iterator();
         List<SysAttachment> attachmentList = IteratorUtils.toList(attachmentIterator);
@@ -306,7 +311,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
         }
         String attachBasePath = bootdoConfig.getAttachBasePath();
         File fileDir = new File(attachBasePath);
-        regFile(fileDir, null,sysAttachmentMap);
+        regFile(fileDir, null, sysAttachmentMap);
     }
 
     /**
@@ -317,6 +322,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * @param sysAttachmentMap
      * @throws Exception
      */
+    @Transactional
     private void regFile(File fileDir, SysAttachment parent, Map<String, SysAttachment> sysAttachmentMap) throws Exception {
         if (fileDir.exists()) {
             File[] listFiles = fileDir.listFiles();
@@ -393,6 +399,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
+    @Transactional
     public void mkDir(Map<String, Object> paraMap) {
         String dirName = (String) paraMap.get("dirName");
         String parentId = (String) paraMap.get("parentId");
@@ -418,6 +425,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
+    @Transactional
     public void downFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
         String id = (String) paraMap.get("id");
@@ -479,6 +487,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
+    @Transactional
     public void del(Map<String, Object> paraMap) throws IOException {
         String ids = (String) paraMap.get("ids");
         if (StringUtils.isNotEmpty(ids)) {
