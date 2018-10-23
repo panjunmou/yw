@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/js/plugins/FlexPaper/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/plugins/FlexPaper/js/flexpaper_flash.js"></script>
+    <script type="text/javascript" src="/js/plugins/FlexPaper/js/flexpaper_flash_debug.js"></script>
+</head>
+<body>
+<div style="position:absolute;left:10px;top:10px;width: 1024px;height: 750px">
+    <a id="viewerPlaceHolder" style="width:100%;height:100%;display:block"></a>
+    <script type="text/javascript" th:inline="javascript">
+        var filePath = [[${filePath}]];
+
+        $(function () {
+            var fp = new FlexPaperViewer(
+                '/js/plugins/FlexPaper/swfFiles/FlexPaperViewer',
+                'viewerPlaceHolder',
+                {
+                    config: {
+                        SwfFile: escape('/tempPath' + filePath),
+                        Scale: 0.6,
+                        ZoomTransition: 'easeOut',
+                        ZoomTime: 0.5,
+                        ZoomInterval: 0.2,
+                        FitPageOnLoad: true,
+                        FitWidthOnLoad: false,
+                        PrintEnabled: true,
+                        FullScreenAsMaxWindow: false,
+                        ProgressiveLoading: false,
+                        MinZoomSize: 0.2,
+                        MaxZoomSize: 5,
+                        SearchMatchAll: false,
+                        InitViewMode: 'Portrait',
+                        ViewModeToolsVisible: true,
+                        ZoomToolsVisible: true,
+                        NavToolsVisible: true,
+                        CursorToolsVisible: true,
+                        SearchToolsVisible: true,
+                        localeChain: 'en_US'
+                    }
+                })
+            ;
+        });
+    </script>
+</div>
+</body>
+</html>

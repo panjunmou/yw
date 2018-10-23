@@ -108,7 +108,7 @@
         </div>
     </div>
 </div>
-<div id="readOnLineDialog" style="display: none">
+<div id="readOnLineImgDialog" style="display: none">
     <img id="readOnLineImg" src="" width="100%" height="100%"/>
 </div>
 <!-- 全局js -->
@@ -372,26 +372,26 @@
                 var isDirectory = checkedDiv.attr("isDirectory");
                 if (isDirectory == 1) {
                     $("#readBtn").attr("disabled", true);
-                }else{
+                } else {
                     var fileExt = checkedDiv.attr("fileExt");
-                    if(
+                    if (
                         fileExt == 'doc' ||
-                        fileExt == 'docx'||
-                        fileExt == 'xlsx'||
-                        fileExt == 'xls'||
-                        fileExt == 'jpg'||
-                        fileExt == 'gif'||
-                        fileExt == 'png'||
-                        fileExt == 'pdf'||
-                        fileExt == 'ppt'||
+                        fileExt == 'docx' ||
+                        fileExt == 'xlsx' ||
+                        fileExt == 'xls' ||
+                        fileExt == 'jpg' ||
+                        fileExt == 'gif' ||
+                        fileExt == 'png' ||
+                        fileExt == 'pdf' ||
+                        fileExt == 'ppt' ||
                         fileExt == 'pptx'
-                    ){
+                    ) {
                         $("#readBtn").attr("disabled", false);
-                    }else{
+                    } else {
                         $("#readBtn").attr("disabled", true);
                     }
                 }
-            }else{
+            } else {
                 $("#readBtn").attr("disabled", true);
             }
         } else {
@@ -526,15 +526,41 @@
             );
             return;
         }
+        var fileExt = checkedDiv.attr("fileExt");
+        var id = checkedDiv.attr("id");
         var persistedFileName = checkedDiv.attr("persistedFileName");
-        $("#readOnLineImg").attr("src", "/imgPath/" + persistedFileName);
-        layer.open({
-            type: 1,
-            title: '在线预览',
-            area: ['80%', '80%'],
-            content: $("#readOnLineDialog"),
-            maxmin: true
-        });
+        if (
+            fileExt == 'doc' ||
+            fileExt == 'docx' ||
+            fileExt == 'xlsx' ||
+            fileExt == 'xls' ||
+            fileExt == 'pdf' ||
+            fileExt == 'ppt' ||
+            fileExt == 'pptx'
+        ) {
+            layer.open({
+                type: 2,
+                title: '在线预览',
+                maxmin: true,
+                shadeClose: false, // 点击遮罩关闭层
+                closeBtn: 1,// 不显示右上角的关闭
+                area: ['80%', '80%'],
+                content: 'attactment/readOnLine?id=' + id
+            });
+        } else if (
+            fileExt == 'jpg' ||
+            fileExt == 'gif' ||
+            fileExt == 'png'
+        ) {
+            $("#readOnLineImg").attr("src", "/basePath/" + persistedFileName);
+            layer.open({
+                type: 1,
+                title: '在线预览',
+                area: ['80%', '80%'],
+                content: $("#readOnLineImgDialog"),
+                maxmin: true
+            });
+        }
     }
 
     function newDir() {

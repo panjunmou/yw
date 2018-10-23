@@ -3,6 +3,7 @@ package com.bootdo.common.controller;
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.SysAttachmentService;
+import com.bootdo.common.utils.Office2Swf;
 import com.bootdo.common.utils.RequestUtil;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.ResultMessage;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -206,6 +208,7 @@ public class SysAttactmentController extends BaseController {
 
     /**
      * 下载
+     *
      * @param request
      * @param response
      * @throws IOException
@@ -213,6 +216,24 @@ public class SysAttactmentController extends BaseController {
     @RequestMapping("/download")
     @ResponseBody
     public void doDownloadFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        this.attachmentService.downFile(request,response);
+        this.attachmentService.downFile(request, response);
+    }
+
+    /**
+     * 在线预览
+     *
+     * @param model
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/readOnLine")
+    public String readOnLine(Model model, HttpServletRequest request) throws IOException {
+        Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
+
+        String outFilePath = attachmentService.convertFile(queryParamMap);
+        outFilePath = outFilePath.replace(bootdoConfig.getAttachTempPath(), "");
+        model.addAttribute("filePath", outFilePath);
+        return "common/attactment/readOnLine";
     }
 }

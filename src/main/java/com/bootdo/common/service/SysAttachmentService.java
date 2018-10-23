@@ -42,4 +42,6 @@ public interface SysAttachmentService {
     void downFile(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     void del(Map<String, Object> paraMap) throws IOException;
+
+    String convertFile(Map<String, Object> queryParamMap) throws IOException;
 }
