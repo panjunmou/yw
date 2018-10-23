@@ -128,7 +128,6 @@
     var parentId;
     var parentAttArr = {};
     var isManager = [[${isManager}]];
-    var isManager = [[${basePath}]];
     $(function () {
         //组织机构树
         initOrgTree();
@@ -357,8 +356,8 @@
             } else {
                 $("#uploadBtn").attr("disabled", true);
             }
-            controlBtnPer();
         }
+        controlBtnPer();
     }
 
     function controlBtnPer() {
@@ -396,7 +395,7 @@
             }
         } else {
             //获取当前所有选中的文件夹,取权限交集
-            var permissionAll = ['view', 'down', 'delete'];
+            var permissionAll = ['view', 'down', 'delete', 'readOnLine'];
             if (checkedDiv.length == 0) {
                 $("#delBtn").attr("disabled", true);
                 $("#downBtn").attr("disabled", true);
@@ -411,11 +410,14 @@
             });
             var downFlag = false;
             var delFlag = false;
+            var readOnLineFlag = false;
             $.each(permissionAll, function (i, v) {
                 if (v == 'down') {
                     downFlag = true;
                 } else if (v == 'delete') {
                     delFlag = true;
+                } else if (v == 'readOnLine') {
+                    readOnLineFlag = true;
                 }
             });
             if (delFlag) {
@@ -428,6 +430,12 @@
                 $("#downBtn").attr("disabled", false);
             } else {
                 $("#downBtn").attr("disabled", true);
+            }
+
+            if (readOnLineFlag) {
+                $("#readBtn").attr("disabled", false);
+            } else {
+                $("#readBtn").attr("disabled", true);
             }
         }
     }

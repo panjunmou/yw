@@ -11,6 +11,8 @@ public enum FileRoleEnums {
      */
     DOWN("down", "下载"),
 
+    READONLINE("readOnLine", "在线预览"),
+
     /**
      * 移动
      */

@@ -55,7 +55,6 @@ public class SysAttactmentController extends BaseController {
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
         model.addAttribute("parentId", parentId);
         model.addAttribute("isManager", isManager);
-        model.addAttribute("basePath", bootdoConfig.getAttachBasePath());
         return "common/attactment/initPage";
     }
 
