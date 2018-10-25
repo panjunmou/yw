@@ -81,9 +81,11 @@ public class SysAttachmentRoleController {
      */
     @ResponseBody
     @RequestMapping("/update")
-    public R update(SysAttachmentRole attachmentRole) {
-        attachmentRoleService.update(attachmentRole);
-        return R.ok();
+    public ResultMessage update(HttpServletRequest request) {
+        ResultMessage resultMessage = new ResultMessage();
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        attachmentRoleService.update(paraMap);
+        return resultMessage;
     }
 
     /**

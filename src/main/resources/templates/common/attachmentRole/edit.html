@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="/css/bootstrap.min.css?v=3.3.6">
+    <link rel="stylesheet" href="/css/plugins/toastr/toastr.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.css?v=4.4.0">
+    <link rel="stylesheet" href="/css/animate.css">
+    <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+    <link rel="stylesheet" href="/css/plugins/bootstrap-select/bootstrap-select.css">
+    <link rel="stylesheet" href="/css/plugins/bootstrap-iCheck/skins/flat/green.css">
+</head>
+<body class="gray-bg">
+<div class="container" style="width: 95%;">
+    <div class="row">
+        <form class="form-horizontal" id="roleForm" style="padding: 5px;">
+            <input type="hidden" name="relationId"/>
+            <input type="hidden" name="type" value="person"/>
+            <input type="hidden" name="id" th:value="${attachmentRole.id}"/>
+            <input type="hidden" name="attactmentId" th:value="${attachmentRole.attactmentId}"/>
+            <div class="form-group gg-formGroup" id="personDiv">
+                <label for="person" class="col-sm-2 control-label">选择人员:</label>
+                <div class="col-sm-10">
+                    <select class="form-control dropdown selectpicker" data-style="btn-white" data-live-search="true"
+                            name="person" id="person" data-dropup-auto="false">
+                        <option value="">请选择...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">权限:</label>
+                <div class="col-sm-10">
+                    <div class="row" style="margin-left: 2px">
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" id="viewC" value="view"/> 查看
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" id="downC" value="down"/> 下载
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" id="readOnLineC" value="readOnLine"/> 在线预览
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-left: 2px">
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" id="deleteC" value="delete"/> 删除
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" id="uploadC" value="upload"/> 上传
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="permission" id="mkdirC" value="mkdir"/> 创建文件夹
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="text-center">
+            <button type="button" class="btn btn-info" onclick="saveRole()">保存</button>&nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default" onclick="closeRole()">关闭</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/js/jquery.min.js?v=2.1.4"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js?v=3.3.6"></script>
+<script type="text/javascript" src="/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/js/ajaxExt.js"></script>
+<script type="text/javascript" src="/js/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap-select/bootstrap-select.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap-select/i18n/defaults-zh_CN.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap-iCheck/icheck.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery.serializeObject.js"></script>
+
+<!--校验插件-->
+<script src="/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/js/plugins/validate/jquery.validate.extend.js"></script>
+<script src="/js/plugins/validate/messages_zh.min.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    var attachmentRole = [[${attachmentRole}]];
+
+    $(function () {
+        $("#roleForm").validate({
+            errorElement: 'span',
+            errorClass: 'help-block error-mes',
+            rules: {
+                person: {
+                    required: true
+                }
+            },
+            errorPlacement: function (error, element) {
+            },
+            highlight: function (element) {
+                $(element).closest('.gg-formGroup').addClass('has-error has-feedback');
+            },
+            success: function (label) {
+                var el = label.closest('.gg-formGroup').find("input");
+                el.next().remove();
+                label.closest('.gg-formGroup').removeClass('has-error').addClass("has-feedback has-success");
+                label.remove();
+            },
+            submitHandler: function (form) {
+            }
+        });
+
+        loadPerson();
+
+        $('input[type="checkbox"]').iCheck({
+            checkboxClass: 'icheckbox_flat-green',
+            radioClass: 'iradio_flat-green',
+            increaseArea: '20%'
+        });
+
+        var permissionArr = attachmentRole.permission.split(',');
+        $.each(permissionArr, function (i, v) {
+            $("#"+ v + "C").iCheck('check');
+        });
+
+        $("#dept").change(function () {
+            $("[name='relationId']").val($(this).val());
+        });
+        $("#person").change(function () {
+            $("[name='relationId']").val($(this).val());
+        });
+    });
+
+    function loadPerson() {
+        $.ajaxExt({
+            url: "/sys/user/listAll",
+            data: {},
+            success: function (data) {
+                $.each(data, function (i, v) {
+                    $("#person").append("<option value=" + v.userId + ">" + v.name + "</option>");
+                });
+                $('#person').selectpicker('refresh');
+                $('#person').selectpicker('val', attachmentRole.relationId);
+
+            }
+        });
+    }
+
+    function saveRole() {
+        if (!$("#roleForm").valid()) {
+            return false;
+        }
+        var roleData = $("#roleForm").serializeObject();
+        $.ajaxExt({
+            url: "/common/attachmentRole/update",
+            data: roleData,
+            success: function (data) {
+                if (data.result == 1) {
+                    parent.layer.msg("操作成功");
+                    parent.reLoad();
+                    var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+                    parent.layer.close(index);
+                } else {
+                    parent.layer.msg(data.msg);
+                }
+            }
+        });
+    }
+
+    function closeRole() {
+        var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+        parent.layer.close(index);
+    }
+
+</script>
+</body>
+</html>

@@ -21,6 +21,9 @@
                     <button type="button" class="btn btn-primary" onclick="addRole()">
                         <i class="fa fa-plus" aria-hidden="true"></i>添加
                     </button>
+                    <button type="button" class="btn btn-info" onclick="editRole()">
+                        <i class="fa fa-edit" aria-hidden="true"></i>修改
+                    </button>
                     <button type="button" class="btn btn-danger" onclick="delRole()">
                         <i class="fa fa-trash" aria-hidden="true"></i>删除
                     </button>
@@ -145,6 +148,19 @@
                             }
                         }
                     },
+                    {
+                        field: 'readOnLine',
+                        title: '在线预览',
+                        align: 'center',
+                        valign: 'middle',
+                        formatter: function (value, row, index) {
+                            if (value == '-1') {
+                                return '<span class="label label-danger">否</span>';
+                            } else if (value == '1') {
+                                return '<span class="label label-primary">是</span>';
+                            }
+                        }
+                    },
                     /*{
                         field: 'move',
                         title: '移动',
@@ -237,6 +253,27 @@
             // area: ['660px', '418px'],
             area: ['80%', '80%'],
             content: 'attachmentRole/add?id=' + id
+        });
+    }
+
+    function editRole() {
+        var selections = $('#roleTable').bootstrapTable("getSelections");
+        console.log(selections);
+        console.log(selections[0].id);
+        if (selections.length != 1) {
+            layer.msg("请选择一条要修改的数据");
+            return;
+        }
+        console.log(selections[0].id);
+        layer.open({
+            type: 2,
+            title: '修改权限',
+            maxmin: false,
+            shadeClose: false, // 点击遮罩关闭层
+            closeBtn: 1,// 不显示右上角的关闭
+            // area: ['660px', '418px'],
+            area: ['80%', '80%'],
+            content: 'attachmentRole/edit/' + selections[0].id
         });
     }
 

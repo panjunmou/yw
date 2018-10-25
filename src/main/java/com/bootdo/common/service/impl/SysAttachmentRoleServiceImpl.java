@@ -31,10 +31,6 @@ public class SysAttachmentRoleServiceImpl implements SysAttachmentRoleService {
     private SysAttachmentRoleMapper sysAttachmentRoleMapper;
     @Resource
     private SysAttachmentRoleDao sysAttachmentRoleDao;
-    @Resource
-    private UserDao userDao;
-    @Resource
-    private DeptDao deptDao;
 
     @Override
     public SysAttachmentRole get(Long id) {
@@ -65,8 +61,18 @@ public class SysAttachmentRoleServiceImpl implements SysAttachmentRoleService {
     }
 
     @Override
-    public int update(SysAttachmentRole attachmentRole) {
-        return sysAttachmentRoleMapper.update(attachmentRole);
+    public SysAttachmentRole update(Map<String, Object> paraMap) {
+        String id = (String) paraMap.get("id");
+        if (StringUtils.isNotEmpty(id)) {
+            SysAttachmentRole sysAttachmentRole = sysAttachmentRoleDao.findById(Long.parseLong(id)).get();
+            String permissionStr = (String) paraMap.get("permission[]");
+            if (!StringUtils.isEmpty(permissionStr)) {
+                sysAttachmentRole.setPermission(permissionStr);
+            }
+            SysAttachmentRole save = sysAttachmentRoleDao.save(sysAttachmentRole);
+            return save;
+        }
+        return null;
     }
 
     @Override

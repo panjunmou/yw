@@ -4,8 +4,8 @@
 <mapper namespace="com.bootdo.common.dao.SysAttachmentRoleMapper">
 
     <select id="get" resultType="com.bootdo.common.domain.SysAttachmentRole">
-		select `id`,`attactment_id`,`relation_id`,`type`,`create_id`,`create_name`,`create_date`,`update_date`,`update_name`,`update_id`
-		from sys_attachment_role where id = #{value}
+		select sar.*
+		from sys_attachment_role sar where id = #{value}
 	</select>
 
     <select id="list" resultType="com.bootdo.common.vo.SysAttachmentRoleVO">
@@ -13,11 +13,9 @@
         su.name as relationName,
         if (find_in_set('view', permission) = 0, -1, 1) as view,
         if (find_in_set('down', permission) = 0, -1, 1) as down,
-        -- if (find_in_set('move', permission) = 0, -1, 1) as move,
-        -- if (find_in_set('copy', permission) = 0, -1, 1) as copy,
         if (find_in_set('delete', permission) = 0, -1, 1) as del,
-        -- if (find_in_set('changeName', permission) = 0, -1, 1) as changeName,
         if (find_in_set('upload', permission) = 0, -1, 1) as upload,
+        if (find_in_set('readOnLine', permission) = 0, -1, 1) as readOnLine,
         if (find_in_set('mkDir', permission) = 0, -1, 1) as mkDir
         from sys_attachment_role sar
         left join sys_user su on su.user_id = sar.relation_id

@@ -26,6 +26,7 @@ public class SysAttachmentRoleVO {
     private Integer copy;
     private Integer del;
     private Integer changeName;
+    private Integer readOnLine;
     private Integer upload;
     private Integer mkDir;
 
@@ -131,5 +132,13 @@ public class SysAttachmentRoleVO {
 
     public void setMkDir(Integer mkDir) {
         this.mkDir = mkDir;
+    }
+
+    public Integer getReadOnLine() {
+        return readOnLine;
+    }
+
+    public void setReadOnLine(Integer readOnLine) {
+        this.readOnLine = readOnLine;
     }
 }

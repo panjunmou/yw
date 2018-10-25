@@ -21,7 +21,7 @@ public interface SysAttachmentRoleService {
 
     SysAttachmentRole save(Map<String, Object> paraMap);
 
-    int update(SysAttachmentRole sysAttachmentRole);
+    SysAttachmentRole update(Map<String, Object> paraMap);
 
     int remove(Long id);
 
