@@ -39,7 +39,7 @@ $.ywWebUpload = function (options) {
      * 初始化页面
      */
     function initPage() {
-        console.log('初始化页面:initPage');
+        // console.log('初始化页面:initPage');
         id = 'picker';
         $wrap = $("#uploader");
         $fileTpl = $(".raw_type");
@@ -76,7 +76,7 @@ $.ywWebUpload = function (options) {
      * 销毁
      */
     function destroy() {
-        console.log('销毁:destroy');
+        // console.log('销毁:destroy');
         $wrap.hide();
         try {
             uploader.destroy();
@@ -95,7 +95,7 @@ $.ywWebUpload = function (options) {
      * @returns {*}
      */
     function chunkUploadFinish(file) {
-        console.log('在所有分片都上传完毕后:chunkUploadFinish');
+        // console.log('在所有分片都上传完毕后:chunkUploadFinish');
         var deferred = $.Deferred();
         var chunks = file.blocks.length;
         var data = {
@@ -106,7 +106,7 @@ $.ywWebUpload = function (options) {
         };
         if (options.formData)
             jQuery.extend(data, options.formData);
-        console.log(cfg.fileMergeUrl);
+        // console.log(cfg.fileMergeUrl);
         $.ajax({
             cache: false,
             async: true,
@@ -138,7 +138,7 @@ $.ywWebUpload = function (options) {
      * 断点续传，每个分片在发送之前
      */
     function preupload(cutedFile) {
-        console.log('断点续传:preupload');
+        // console.log('断点续传:preupload');
         //分片验证是否已传过，用于断点续传
         var deferred = new WebUploader.Base.Deferred();
         uploader.md5File(cutedFile.blob).then(function (md5) {
@@ -217,7 +217,7 @@ $.ywWebUpload = function (options) {
      * @param file
      */
     function fileQueued(file) {
-        console.log('文件添加的时候触发:fileQueued');
+        // console.log('文件添加的时候触发:fileQueued');
         var $li = $('<li id="' + file.id + '"></li>');
         var ftpl = $fileTpl.clone();
         ftpl.css("display", "block");
@@ -247,7 +247,7 @@ $.ywWebUpload = function (options) {
                 url: cfg.checkWholeMd5Url,//isExistWholeFile
                 data: data,
                 success: function (result) {
-                    console.log(result);
+                    // console.log(result);
                     if (result.result == 1)//存在，直接后台复制
                     {
                         setTimeout(function () {
@@ -283,7 +283,7 @@ $.ywWebUpload = function (options) {
      * @param percentage
      */
     function uploadProgress(file, percentage) {
-        console.log('文件上传进度监控:uploadProgress');
+        // console.log('文件上传进度监控:uploadProgress');
         var $li = $('#' + file.id);
         if (!file.uploadProgress)
             file.uploadProgress = 0;
@@ -299,7 +299,7 @@ $.ywWebUpload = function (options) {
      * @param file
      */
     function uploadStart(file) {
-        console.log('某个文件开始上传前触发:uploadStart');
+        // console.log('某个文件开始上传前触发:uploadStart');
         var $li = $('#' + file.id);
         $li.find('a.icon_att ').css("display", "block");
         //给class为ctrl_del的绑定click事件
@@ -352,7 +352,7 @@ $.ywWebUpload = function (options) {
      * @param file
      */
     function stopUpload(file) {
-        console.log('文件暂停的时候:stopUpload');
+        // console.log('文件暂停的时候:stopUpload');
         var $li = $('#' + file.id);
         $li.find('.ft_l_listItem_info').text("暂停");
     }
@@ -363,7 +363,7 @@ $.ywWebUpload = function (options) {
      * @Param formdata 参数
      * */
     function uploadBeforeSend(object, formData, headers) {
-        console.log('当文件的分块在发送前触发:uploadBeforeSend');
+        // console.log('当文件的分块在发送前触发:uploadBeforeSend');
         headers.Accept = "application/json, text/javascript, */*";//解决http错误
         if (options.formData)
             jQuery.extend(formData, options.formData);
@@ -376,7 +376,7 @@ $.ywWebUpload = function (options) {
      * @param reason
      */
     function uploadError(file, reason) {
-        console.log('上传出错的时候触发:uploadError');
+        // console.log('上传出错的时候触发:uploadError');
         var $li = $('#' + file.id);
         if (!file.kretry)
             file.kretry = 0;
