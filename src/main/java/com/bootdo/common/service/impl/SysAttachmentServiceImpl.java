@@ -403,22 +403,38 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     public void mkDir(Map<String, Object> paraMap) {
         String dirName = (String) paraMap.get("dirName");
         String parentId = (String) paraMap.get("parentId");
-        SysAttachment parent = sysAttachmentDao.findById(Long.parseLong(parentId)).get();
-        String persistedFileName = parent.getPersistedFileName();
-        String realPath = bootdoConfig.getAttachBasePath() + persistedFileName + "/" + dirName;
-        //生成数据
-        SysAttachment attachment = new SysAttachment();
-        attachment.setOriginalFullName(dirName);
-        attachment.setOriginalFileName(dirName);
-        attachment.setFileExt("");
-        attachment.setIsDirectory(1);
-        attachment.setPersistedFileName(parent.getPersistedFileName() + "/" + dirName);
-        attachment.setParentId(parent == null ? 0l : parent.getId());
-        attachment.setFileSize(null);
-        sysAttachmentDao.save(attachment);
-        attachment.setPath(parent == null ? attachment.getId().toString() : (parent.getPath() + "." + attachment.getId()));
-        sysAttachmentDao.save(attachment);
-
+        Optional<SysAttachment> optional = sysAttachmentDao.findById(Long.parseLong(parentId));
+        String realPath;
+        if (optional.isPresent()) {
+            SysAttachment parent = optional.get();
+            String persistedFileName = parent.getPersistedFileName();
+            realPath = bootdoConfig.getAttachBasePath() + persistedFileName + "/" + dirName;
+            //生成数据
+            SysAttachment attachment = new SysAttachment();
+            attachment.setOriginalFullName(dirName);
+            attachment.setOriginalFileName(dirName);
+            attachment.setFileExt("");
+            attachment.setIsDirectory(1);
+            attachment.setPersistedFileName(parent.getPersistedFileName() + "/" + dirName);
+            attachment.setParentId(parent == null ? 0l : parent.getId());
+            attachment.setFileSize(null);
+            sysAttachmentDao.save(attachment);
+            attachment.setPath(parent == null ? attachment.getId().toString() : (parent.getPath() + "." + attachment.getId()));
+            sysAttachmentDao.save(attachment);
+        } else {
+            realPath = bootdoConfig.getAttachBasePath() + "/" + dirName;
+            SysAttachment attachment = new SysAttachment();
+            attachment.setOriginalFullName(dirName);
+            attachment.setOriginalFileName(dirName);
+            attachment.setFileExt("");
+            attachment.setIsDirectory(1);
+            attachment.setPersistedFileName(dirName);
+            attachment.setParentId(0l);
+            attachment.setFileSize(null);
+            sysAttachmentDao.save(attachment);
+            attachment.setPath(attachment.getId().toString());
+            sysAttachmentDao.save(attachment);
+        }
         //创建文件夹
         File file = new File(realPath);
         file.mkdir();
