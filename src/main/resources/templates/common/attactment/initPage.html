@@ -44,12 +44,13 @@
                                 disabled="disabled">
                             <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
                         </button>&nbsp;&nbsp;
-                        <!--<button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
-                            <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> 复制
-                        </button>&nbsp;&nbsp;
                         <button type="button" id="moveBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
                         </button>&nbsp;&nbsp;
+                        <!--<button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
+                            <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> 复制
+                        </button>&nbsp;&nbsp;
+
                         <button type="button" id="changeNameBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
                         </button>&nbsp;&nbsp;-->
@@ -342,6 +343,7 @@
             $("#newDirBtn").attr("disabled", false);
             $("#readBtn").attr("disabled", false);
             $("#uploadBtn").attr("disabled", false);
+            $("#moveBtn").attr("disabled", false);
         } else if (parentId != '0') {
             //获取父级权限,设置"新建文件夹"和"上传"按钮是否可用
             var parentAtt = parentAttArr[parentId];
@@ -367,6 +369,7 @@
             $("#delBtn").attr("disabled", false);
             $("#newDirBtn").attr("disabled", false);
             $("#uploadBtn").attr("disabled", false);
+            $("#moveBtn").attr("disabled", false);
             if (checkedDiv.length == 1) {
                 var isDirectory = checkedDiv.attr("isDirectory");
                 if (isDirectory == 1) {
