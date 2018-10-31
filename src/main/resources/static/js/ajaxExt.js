@@ -25,8 +25,7 @@ $.ajaxExt = function (opts) {
                         color: '#fff',
                         'z-index': 9999999999
                     }
-                })
-                ;
+                });
             }
         },
         complete: function () {

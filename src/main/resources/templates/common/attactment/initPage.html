@@ -579,9 +579,11 @@
             content: $("#contactDialog"),
             btnAlign: 'c',
             btn: ['确定', '取消'],
+            zIndex: 1000,
             btn1: function (index, layero) {
                 $.ajaxExt({
                     url: "attactment/mkDir",
+                    showWaitting: true,
                     data: {
                         parentId: parentId,
                         dirName: $("#dirName").val()
