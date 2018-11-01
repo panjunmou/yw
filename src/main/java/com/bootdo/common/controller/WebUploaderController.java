@@ -188,7 +188,7 @@ public class WebUploaderController extends BaseController {
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
         String parentId = queryParamMap.get("parentId") == null ? "0" : (String) queryParamMap.get("parentId");
         SysAttachmentVO parentAtt = attachmentService.getById(Long.parseLong(parentId));
-        String persistedFileName = parentAtt.getPersistedFileName() == null ? "" : parentAtt.getPersistedFileName();
+        String persistedFileName = parentAtt == null ? "" : parentAtt.getPersistedFileName();
         String path = bootdoConfig.getAttachBasePath() + persistedFileName;
 
         ResultMessage mes = new ResultMessage();

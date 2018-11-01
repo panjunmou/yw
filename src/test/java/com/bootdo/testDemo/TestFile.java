@@ -43,4 +43,9 @@ public class TestFile {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void testMove() throws IOException {
+        FileUtils.moveFile(new File("D:/share/export.xls"),new File("D:/share/test111/aaa.xls"));
+    }
 }

@@ -244,9 +244,10 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      */
     @Override
     public SysAttachmentVO getById(Long id) {
-        SysAttachmentVO vo = new SysAttachmentVO();
+        SysAttachmentVO vo = null;
         Optional<SysAttachment> attachmentOptional = sysAttachmentDao.findById(id);
         if (attachmentOptional.isPresent()) {
+            vo = new SysAttachmentVO();
             SysAttachment attachment = attachmentOptional.get();
             BeanUtils.copyProperties(attachment, vo);
         }
@@ -323,7 +324,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
      * @throws Exception
      */
     @Transactional
-    private void regFile(File fileDir, SysAttachment parent, Map<String, SysAttachment> sysAttachmentMap) throws Exception {
+    void regFile(File fileDir, SysAttachment parent, Map<String, SysAttachment> sysAttachmentMap) throws Exception {
         if (fileDir.exists()) {
             File[] listFiles = fileDir.listFiles();
             for (File file : listFiles) {
@@ -562,5 +563,54 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
             return outRealPath;
         }
         return "";
+    }
+
+    @Override
+    public void move(Map<String, Object> paraMap) throws Exception {
+        String moveAttIds = (String) paraMap.get("moveAttIds");
+        String targetId = (String) paraMap.get("targetId");
+        String parentId = (String) paraMap.get("parentId");
+        if (parentId.equals(targetId)) {
+            throw new Exception("同一级目录,不需要移动");
+        }
+        SysAttachment tarSysAtt = sysAttachmentDao.findById(Long.parseLong(targetId)).get();
+        if (StringUtil.isEmpty(targetId) || tarSysAtt == null) {
+            throw new Exception("没有找到目标文件夹!请刷新重试!");
+        }
+        if (StringUtil.isEmpty(moveAttIds)) {
+            throw new Exception("没有找到需要移动的文件,请刷新重试!");
+        }
+        String[] moveAttIdArr = moveAttIds.split(",");
+        Long[] longs = new Long[moveAttIdArr.length];
+        for (int i = 0; i < moveAttIdArr.length; i++) {
+            String id = moveAttIdArr[i];
+            longs[i] = Long.parseLong(id);
+        }
+        List<SysAttachment> attachmentList = sysAttachmentDao.findByIdIn(longs);
+        if (attachmentList != null) {
+            List<SysAttachment> saveList = new ArrayList<>();
+            for (int i = 0; i < attachmentList.size(); i++) {
+                SysAttachment sysAttachment = attachmentList.get(i);
+                Integer isDirectory = sysAttachment.getIsDirectory();
+                if (isDirectory == 0) {
+                    //是文件
+                    sysAttachment.setParentId(tarSysAtt.getId());
+                    sysAttachment.setPath(tarSysAtt.getPath() + "." + sysAttachment.getId());
+                    sysAttachment.setPersistedFileName(tarSysAtt.getPersistedFileName() + "/" + sysAttachment.getOriginalFullName());
+                } else {
+                    //是文件夹
+                }
+                saveList.add(sysAttachment);
+            }
+            sysAttachmentDao.saveAll(saveList);
+            SysAttachment oldParent = sysAttachmentDao.findById(Long.parseLong(parentId)).get();
+            for (int i = 0; i < saveList.size(); i++) {
+                SysAttachment sysAttachment = saveList.get(i);
+                String oldPersist = oldParent.getPersistedFileName();
+                File sourceFile = new File(bootdoConfig.getAttachBasePath() + oldPersist + "/" + sysAttachment.getOriginalFullName());
+                File targetFile = new File(bootdoConfig.getAttachBasePath() + "/" + sysAttachment.getPersistedFileName());
+                FileUtils.moveFile(sourceFile,targetFile);
+            }
+        }
     }
 }

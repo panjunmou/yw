@@ -44,7 +44,7 @@
                                 disabled="disabled">
                             <i class="glyphicon glyphicon-download" aria-hidden="true"></i> 下载
                         </button>&nbsp;&nbsp;
-                        <button type="button" id="moveBtn" class="btn btn-info" onclick="" disabled="disabled">
+                        <button type="button" id="moveBtn" class="btn btn-info" onclick="move()">
                             <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
                         </button>&nbsp;&nbsp;
                         <!--<button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
@@ -109,6 +109,9 @@
         </div>
     </div>
 </div>
+<div id="moveDialog" style="display: none">
+    <div id="selTree" style="height: 500px;overflow-y :scroll;"></div>
+</div>
 <div id="readOnLineImgDialog" style="display: none">
     <img id="readOnLineImg" src="" width="100%" height="100%"/>
 </div>
@@ -132,7 +135,7 @@
     $(function () {
         //组织机构树
         initOrgTree();
-
+        initSelTree();
         loadFile();
 
         $(".allIcon").click(function () {
@@ -470,6 +473,30 @@
         });
     }
 
+    function initSelTree() {
+        $.ajaxExt({
+            url: "attactment/listTree",
+            type: 'GET',
+            data: {
+                containsFile: '0'//不包含文件
+            },
+            success: function (data) {
+                $('#selTree').treeview(
+                    {
+                        data: data.data,
+                        loadingIcon: "glyphicon glyphicon-refresh",//懒加载过程中显示的沙漏字符图标
+                        lazyLoad: loadData
+                    }
+                );
+                $('#selTree').treeview('search', [$("#orgKeyWord").val(), {
+                    ignoreCase: true,    // case insensitive
+                    exactMatch: false,   // like or equals
+                    revealResults: true // reveal matching nodes
+                }]);
+            }
+        });
+    }
+
     function loadData(node, func) {
         //这个技巧真高，即能得到节点数据，又能把节点下级的数据通过函数发回去
         $.ajaxExt({
@@ -590,6 +617,84 @@
                     data: {
                         parentId: parentId,
                         dirName: $("#dirName").val()
+                    },
+                    success: function (data) {
+                        if (data.result == 1) {
+                            layer.msg("新建成功");
+                            layer.close(index);
+                        } else {
+                            layer.msg("新建失败");
+                            layer.close(index);
+                        }
+                        $("#dirName").val('');
+                        reloadFile(parentId);
+                    }
+                });
+            },
+            btn2: function (index, layero) {
+                $("#dirName").val('');
+                layer.close(index);
+            }
+        });
+    }
+
+    function move() {
+        var checkedDiv = $("#fileDiv div[data-show='yes']");
+        if (checkedDiv.length == 0) {
+            layer.alert(
+                '请至少选择一个文件',
+                {
+                    title: '提示',
+                    time: 0,//不自动关闭,
+                    icon: 2
+                }
+            );
+            return;
+        }
+        var moveAttIds = '';
+        $.each(checkedDiv, function (i, v) {
+            var id = $(v).attr("id");
+            moveAttIds += id + ",";
+        });
+        layer.open({
+            type: 1,
+            title: '移动到',
+            area: '30%',
+            content: $("#moveDialog"),
+            btnAlign: 'c',
+            btn: ['确定', '取消'],
+            zIndex: 1000,
+            btn1: function (index, layero) {
+                var selNode = $('#selTree').treeview('getSelected')[0];
+                if (selNode == undefined || selNode == null || selNode == '') {
+                    layer.alert(
+                        '请选择移动到的文件夹!',
+                        {
+                            title: '提示',
+                            time: 0,//不自动关闭,
+                            icon: 2
+                        }
+                    );
+                    return;
+                }
+                if (selNode.id == parentId) {
+                    layer.alert(
+                        '同一级目录,不需要移动!',
+                        {
+                            title: '提示',
+                            time: 0,//不自动关闭,
+                            icon: 2
+                        }
+                    );
+                    return;
+                }
+                $.ajaxExt({
+                    url: "attactment/move",
+                    showWaitting: true,
+                    data: {
+                        parentId: parentId,
+                        moveAttIds: moveAttIds,
+                        targetId: selNode.id
                     },
                     success: function (data) {
                         if (data.result == 1) {

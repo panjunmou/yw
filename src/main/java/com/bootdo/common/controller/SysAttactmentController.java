@@ -3,7 +3,6 @@ package com.bootdo.common.controller;
 import com.bootdo.common.config.BootdoConfig;
 import com.bootdo.common.domain.SysAttachment;
 import com.bootdo.common.service.SysAttachmentService;
-import com.bootdo.common.utils.Office2Swf;
 import com.bootdo.common.utils.RequestUtil;
 import com.bootdo.common.vo.BootStrapTreeViewVo;
 import com.bootdo.common.vo.ResultMessage;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -174,12 +172,28 @@ public class SysAttactmentController extends BaseController {
 
     @RequestMapping("/mkDir")
     @ResponseBody
-    public ResultMessage saveOrUpdate(HttpServletRequest request) throws Exception {
+    public ResultMessage mkDir(HttpServletRequest request) throws Exception {
         Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
         ResultMessage resultMessage = new ResultMessage();
         try {
             this.attachmentService.mkDir(paraMap);
             resultMessage.setMessage("新建成功");
+        } catch (Exception e) {
+            resultMessage.setResult(ResultMessage.Error);
+            logger.error(e.getMessage());
+            resultMessage.setMessage(e.getMessage());
+        }
+        return resultMessage;
+    }
+
+    @RequestMapping("/move")
+    @ResponseBody
+    public ResultMessage move(HttpServletRequest request) throws Exception {
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        ResultMessage resultMessage = new ResultMessage();
+        try {
+            this.attachmentService.move(paraMap);
+            resultMessage.setMessage("移动成功");
         } catch (Exception e) {
             resultMessage.setResult(ResultMessage.Error);
             logger.error(e.getMessage());
