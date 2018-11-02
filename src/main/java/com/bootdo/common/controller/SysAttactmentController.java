@@ -197,6 +197,7 @@ public class SysAttactmentController extends BaseController {
         } catch (Exception e) {
             resultMessage.setResult(ResultMessage.Error);
             logger.error(e.getMessage());
+            e.printStackTrace();
             resultMessage.setMessage(e.getMessage());
         }
         return resultMessage;
