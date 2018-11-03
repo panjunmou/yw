@@ -186,6 +186,22 @@ public class SysAttactmentController extends BaseController {
         return resultMessage;
     }
 
+    @RequestMapping("/changeName")
+    @ResponseBody
+    public ResultMessage changeName(HttpServletRequest request) throws Exception {
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        ResultMessage resultMessage = new ResultMessage();
+        try {
+            this.attachmentService.changeName(paraMap);
+            resultMessage.setMessage("重命名成功");
+        } catch (Exception e) {
+            resultMessage.setResult(ResultMessage.Error);
+            logger.error(e.getMessage());
+            resultMessage.setMessage(e.getMessage());
+        }
+        return resultMessage;
+    }
+
     @RequestMapping("/move")
     @ResponseBody
     public ResultMessage move(HttpServletRequest request) throws Exception {

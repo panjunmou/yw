@@ -656,4 +656,39 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
             }
         }
     }
+
+    @Override
+    public void changeName(Map<String, Object> paraMap) throws Exception {
+        String id = (String) paraMap.get("id");
+        Optional<SysAttachment> optional = sysAttachmentDao.findById(Long.parseLong(id));
+        if (optional.isPresent()) {
+            SysAttachment attachment = optional.get();
+            String fullName = (String) paraMap.get("changeFileName");
+            if (attachment.getOriginalFullName().equalsIgnoreCase(fullName)) {
+                throw new Exception("新文件名和旧文件名相同,不需要重命名");
+            }
+            String fileName = fullName;
+            if (fullName.indexOf(".") > 0) {
+                fileName = fullName.substring(0, fullName.lastIndexOf("."));
+            }
+            String oldPath = bootdoConfig.getAttachBasePath() + attachment.getPersistedFileName();
+            File oldFile = new File(oldPath);
+            if (!oldFile.exists()) {
+                throw new Exception("重命名文件不存在,请刷新重试");
+            }
+            String persistedFileName = attachment.getPersistedFileName().replace(attachment.getOriginalFullName(), fullName);
+            attachment.setOriginalFileName(fileName);
+            attachment.setOriginalFullName(fullName);
+            attachment.setPersistedFileName(persistedFileName);
+            String newPath = bootdoConfig.getAttachBasePath() + persistedFileName;
+            File newFile = new File(newPath);
+            if (newFile.exists()) {
+                throw new Exception(fullName + "文件已经存在,请刷新重试");
+            }
+            oldFile.renameTo(newFile);
+            sysAttachmentDao.save(attachment);
+        } else {
+            throw new Exception("没有找到相应的文件");
+        }
+    }
 }

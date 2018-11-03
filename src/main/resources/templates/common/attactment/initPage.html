@@ -47,13 +47,13 @@
                         <button type="button" id="moveBtn" class="btn btn-info" onclick="move()">
                             <i class="glyphicon glyphicon-move" aria-hidden="true"></i> 移动到
                         </button>&nbsp;&nbsp;
+                        <button type="button" id="changeNameBtn" class="btn btn-info" onclick="changeName()">
+                            <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
+                        </button>&nbsp;&nbsp;
                         <!--<button type="button" id="copyBtn" class="btn btn-info" onclick="" disabled="disabled">
                             <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> 复制
                         </button>&nbsp;&nbsp;
-
-                        <button type="button" id="changeNameBtn" class="btn btn-info" onclick="" disabled="disabled">
-                            <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 重命名
-                        </button>&nbsp;&nbsp;-->
+                       -->
                         <button type="button" id="delBtn" class="btn btn-danger" onclick="del()" disabled="disabled">
                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> 删除
                         </button>&nbsp;&nbsp;
@@ -102,6 +102,23 @@
                         <div class="col-sm-8 rowValidate">
                             <input type="text" class="form-control" id="dirName"
                                    name="dirName" placeholder="请输入文件夹名称" maxlength="50"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="changeNameDialog" style="display: none">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <form class="form-horizontal m-t" id="changeNameForm">
+                    <div class="form-group">
+                        <label for="dirName" class="col-sm-3 control-label">文件名称:</label>
+                        <div class="col-sm-8 rowValidate">
+                            <input type="text" class="form-control" id="changeFileName"
+                                   name="changeFileName" placeholder="请输入文件名称" maxlength="50"/>
                         </div>
                     </div>
                 </form>
@@ -188,13 +205,13 @@
                         var fileStr = "";
                         if (attachment.isDirectory == 1) {
                             fileStr +=
-                                '<div class="box template" data-show="no" fileExt="' + attachment.fileExt + '" permission="' + attachment.permission + '" persistedFileName="' + attachment.persistedFileName + '" id="' + attachment.id + '" isDirectory="1">\n';
+                                '<div class="box template" data-show="no" fileExt="' + attachment.fileExt + '" permission="' + attachment.permission + '" originalFullName="' + attachment.originalFullName + '" persistedFileName="' + attachment.persistedFileName + '" id="' + attachment.id + '" isDirectory="1">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/wenjian.png" class="myIcon" alt="">\n';
                         } else {
                             var picStr = getPic(attachment.fileExt);
                             fileStr +=
-                                '<div class="box2 template" data-show="no" fileExt="' + attachment.fileExt + '" permission="' + attachment.permission + '" persistedFileName="' + attachment.persistedFileName + '" id="' + attachment.id + '" isDirectory="0">\n';
+                                '<div class="box2 template" data-show="no" fileExt="' + attachment.fileExt + '" permission="' + attachment.permission + '" originalFullName="' + attachment.originalFullName + '" persistedFileName="' + attachment.persistedFileName + '" id="' + attachment.id + '" isDirectory="0">\n';
                             fileStr +=
                                 '    <img src="/img/attactment/' + picStr + '" class="myIcon" alt="">\n';
                         }
@@ -373,6 +390,7 @@
             $("#newDirBtn").attr("disabled", false);
             $("#uploadBtn").attr("disabled", false);
             $("#moveBtn").attr("disabled", false);
+            $("#changeNameBtn").attr("disabled", false);
             if (checkedDiv.length == 1) {
                 var isDirectory = checkedDiv.attr("isDirectory");
                 if (isDirectory == 1) {
@@ -406,6 +424,7 @@
                 $("#delBtn").attr("disabled", true);
                 $("#downBtn").attr("disabled", true);
                 $("#moveBtn").attr("disabled", true);
+                $("#changeNameBtn").attr("disabled", true);
                 return;
             }
             $.each(checkedDiv, function (i, v) {
@@ -419,6 +438,7 @@
             var delFlag = false;
             var readOnLineFlag = false;
             var moveFlag = false;
+            var changeNameFlag = false;
             $.each(permissionAll, function (i, v) {
                 if (v == 'down') {
                     downFlag = true;
@@ -428,6 +448,8 @@
                     readOnLineFlag = true;
                 } else if (v == 'move') {
                     moveFlag = true;
+                } else if (v == 'changeName') {
+                    changeNameFlag = true;
                 }
             });
             if (delFlag) {
@@ -452,6 +474,12 @@
                 $("#moveBtn").attr("disabled", false);
             } else {
                 $("#moveBtn").attr("disabled", true);
+            }
+
+            if (changeNameFlag) {
+                $("#changeNameBtn").attr("disabled", false);
+            } else {
+                $("#changeNameBtn").attr("disabled", true);
             }
         }
     }
@@ -637,6 +665,58 @@
                             layer.close(index);
                         }
                         $("#dirName").val('');
+                        reloadFile(parentId);
+                    }
+                });
+            },
+            btn2: function (index, layero) {
+                $("#dirName").val('');
+                layer.close(index);
+            }
+        });
+    }
+
+    function changeName() {
+        var checkedDiv = $("#fileDiv div[data-show='yes']");
+        if (checkedDiv.length == 0 || checkedDiv.length > 1) {
+            layer.alert(
+                '请只选择一个文件',
+                {
+                    title: '提示',
+                    time: 0,//不自动关闭,
+                    icon: 2
+                }
+            );
+            return;
+        }
+        var originalFullName = checkedDiv.attr("originalFullName");
+        var id = checkedDiv.attr("id");
+        $("#changeFileName").val(originalFullName);
+        layer.open({
+            type: 1,
+            title: '重命名',
+            area: '60%',
+            content: $("#changeNameDialog"),
+            btnAlign: 'c',
+            btn: ['确定', '取消'],
+            zIndex: 1000,
+            btn1: function (index, layero) {
+                $.ajaxExt({
+                    url: "attactment/changeName",
+                    showWaitting: true,
+                    data: {
+                        id: id,
+                        changeFileName: $("#changeFileName").val()
+                    },
+                    success: function (data) {
+                        if (data.result == 1) {
+                            layer.msg("重命名成功");
+                            layer.close(index);
+                        } else {
+                            layer.msg(data.message);
+                            layer.close(index);
+                        }
+                        $("#changeFileName").val('');
                         reloadFile(parentId);
                     }
                 });

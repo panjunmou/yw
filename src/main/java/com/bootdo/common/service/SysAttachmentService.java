@@ -47,4 +47,5 @@ public interface SysAttachmentService {
 
     void move(Map<String, Object> paraMap) throws Exception;
 
+    void changeName(Map<String, Object> paraMap) throws Exception;
 }
