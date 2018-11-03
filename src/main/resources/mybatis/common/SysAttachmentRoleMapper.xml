@@ -16,6 +16,8 @@
         if (find_in_set('delete', permission) = 0, -1, 1) as del,
         if (find_in_set('upload', permission) = 0, -1, 1) as upload,
         if (find_in_set('readOnLine', permission) = 0, -1, 1) as readOnLine,
+        if (find_in_set('move', permission) = 0, -1, 1) as move,
+        if (find_in_set('changeName', permission) = 0, -1, 1) as changeName,
         if (find_in_set('mkDir', permission) = 0, -1, 1) as mkDir
         from sys_attachment_role sar
         left join sys_user su on su.user_id = sar.relation_id
