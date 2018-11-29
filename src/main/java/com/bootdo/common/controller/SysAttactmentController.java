@@ -11,12 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -258,9 +260,9 @@ public class SysAttactmentController extends BaseController {
      * @throws Exception
      */
     @RequestMapping("/readOnLine")
-    public String readOnLine(Model model, HttpServletRequest request) throws IOException {
+    public String readOnLine(Model model, HttpServletRequest request) throws Exception {
         Map<String, Object> queryParamMap = RequestUtil.getParameterValueMap(request, false, false);
-
+        //获取跟目录
         String outFilePath = attachmentService.convertFile(queryParamMap);
         outFilePath = outFilePath.replace(bootdoConfig.getAttachTempPath(), "");
         model.addAttribute("filePath", outFilePath);

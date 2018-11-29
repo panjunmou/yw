@@ -43,7 +43,7 @@ public interface SysAttachmentService {
 
     void del(Map<String, Object> paraMap) throws IOException;
 
-    String convertFile(Map<String, Object> queryParamMap) throws IOException;
+    String convertFile(Map<String, Object> queryParamMap) throws Exception;
 
     void move(Map<String, Object> paraMap) throws Exception;
 

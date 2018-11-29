@@ -545,7 +545,7 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
     }
 
     @Override
-    public String convertFile(Map<String, Object> queryParamMap) throws IOException {
+    public String convertFile(Map<String, Object> queryParamMap) throws Exception {
         String id = (String) queryParamMap.get("id");
         if (StringUtils.isNotEmpty(id)) {
             SysAttachment sysAttachment = sysAttachmentDao.findById(Long.parseLong(id)).get();
@@ -558,8 +558,8 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
             String outTempPath = bootdoConfig.getAttachTempPath() + "/" + year + "/" + month + "/" + day;
             File zipFile = new File(outTempPath);
             zipFile.mkdirs();
-            String outRealPath = outTempPath + "/" + System.currentTimeMillis() + ".swf";
-            outRealPath = Office2Swf.office2Swf(inputFilePath, outRealPath);
+//            String outRealPath = outTempPath + "/" + System.currentTimeMillis() + ".swf";
+            String outRealPath = Office2Swf.office2Swf(inputFilePath, outTempPath);
             return outRealPath;
         }
         return "";

@@ -57,10 +57,13 @@ public class Office2Swf {
      * 将office文件直接转换为swf文件
      *
      * @param inputFilePath 待转换的源office文件路径
-     * @param outputSwfPath 输出的swf目标文件路径，如果未指定(null)，则按在源文件当前目录生成同名的swf文件
+     * @param outputPath    输出的swf目标文件路径，如果未指定(null)，则按在源文件当前目录生成同名的swf文件
      * @return swf目标文件路径
      */
-    public static String office2Swf(String inputFilePath, String outputSwfPath) throws IOException {
+    public static String office2Swf(String inputFilePath, String outputPath) throws Exception {
+        long currentTimeMillis = System.currentTimeMillis();
+        String outputSwfPath = outputPath + "/" + currentTimeMillis + ".swf";
+
         String outputPdfPath = null;
         String postfix = getPostfix(inputFilePath);
 
@@ -78,8 +81,10 @@ public class Office2Swf {
             FileUtils.copyFile(new File(inputFilePath), new File(outputPdfPath));
             isSucc = true;
         }
+        String markPath = outputPath + "/" + currentTimeMillis + "_mark.pdf";
+        WaterMarkUtil.setPdfWatermark(outputPdfPath, markPath, ShiroUtils.getUser().getName(), true);
         if (isSucc) {
-            outputSwfPath = pdf2Swf(outputPdfPath, outputSwfPath);
+            outputSwfPath = pdf2Swf(markPath, outputPath + "/" + currentTimeMillis + "_mark.swf");
         }
         return outputSwfPath;
     }
