@@ -1,5 +1,6 @@
 package com.bootdo.common.utils;
 
+import com.bootdo.common.config.BootdoConfig;
 import com.lowagie.text.Element;
 import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
+import javax.annotation.Resource;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,9 +45,11 @@ public class WaterMarkUtil {
             // 设置字体
            /* BaseFont base = BaseFont.createFont(ApplicationUtil.getAppAbsolutePath() + "/fonts/SIMSUN.TTC,1",
                     BaseFont.IDENTITY_H, BaseFont.EMBEDDED);*/
-            File file = ResourceUtils.getFile("classpath:static/fonts");
+            /*File file = ResourceUtils.getFile("classpath:static/fonts");
             String absolutePath = file.getAbsolutePath();
-            BaseFont base = BaseFont.createFont(absolutePath + "/SIMSUN.TTC,1", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            System.out.println("absolutePath = " + absolutePath);*/
+
+            BaseFont base = BaseFont.createFont("D:/fonts/SIMSUN.TTC,1", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             // 循环对每页插入水印
             if (isText) {
                 for (int i = 1; i < total; i++) {
