@@ -691,4 +691,26 @@ public class SysAttachmentServiceImpl implements SysAttachmentService {
             throw new Exception("没有找到相应的文件");
         }
     }
+
+    @Override
+    public String setImgWaterMark(Map<String, Object> paraMap) throws Exception {
+        String id = (String) paraMap.get("id");
+        if (StringUtil.isEmpty(id)) {
+            throw new Exception("数据已失效!");
+        }
+        Optional<SysAttachment> attachmentOptional = sysAttachmentDao.findById(Long.parseLong(id));
+        if (!attachmentOptional.isPresent()) {
+            throw new Exception("数据已失效!");
+        }
+        SysAttachment sysAttachment = attachmentOptional.get();
+        String persistedFileName = sysAttachment.getPersistedFileName();
+        Calendar now = Calendar.getInstance();
+        int year = now.get(Calendar.YEAR);
+        int month = now.get(Calendar.MONTH) + 1;
+        int day = now.get(Calendar.DAY_OF_MONTH);
+        long currentTimeMillis = System.currentTimeMillis();
+        String outTempPath = bootdoConfig.getAttachTempPath() + "/" + year + "/" + month + "/" + day + "/" + currentTimeMillis + "." + sysAttachment.getFileExt();
+        WaterMarkUtil.setImgWatermark(bootdoConfig.getAttachBasePath() + "/" + persistedFileName, outTempPath, ShiroUtils.getUser().getName(), sysAttachment.getFileExt());
+        return year + "/" + month + "/" + day + "/" + currentTimeMillis + "." + sysAttachment.getFileExt();
+    }
 }

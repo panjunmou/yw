@@ -628,14 +628,31 @@
             fileExt == 'gif' ||
             fileExt == 'png'
         ) {
-            $("#readOnLineImg").attr("src", "/basePath/" + persistedFileName);
+            $.ajaxExt({
+                url: "attactment/setImgWaterMark",
+                showWaitting: true,
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    $("#readOnLineImg").attr("src", "/tempPath/" + data.data);
+                    layer.open({
+                        type: 1,
+                        title: '在线预览',
+                        area: ['80%', '80%'],
+                        content: $("#readOnLineImgDialog"),
+                        maxmin: true
+                    });
+                }
+            });
+            /*$("#readOnLineImg").attr("src", "/basePath/" + persistedFileName);
             layer.open({
                 type: 1,
                 title: '在线预览',
                 area: ['80%', '80%'],
                 content: $("#readOnLineImgDialog"),
                 maxmin: true
-            });
+            });*/
         }
     }
 

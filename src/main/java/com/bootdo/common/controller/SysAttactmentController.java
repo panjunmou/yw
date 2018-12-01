@@ -268,4 +268,20 @@ public class SysAttactmentController extends BaseController {
         model.addAttribute("filePath", outFilePath);
         return "common/attactment/readOnLine";
     }
+
+    @RequestMapping("/setImgWaterMark")
+    @ResponseBody
+    public ResultMessage setImgWaterMark(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Map<String, Object> paraMap = RequestUtil.getParameterValueMap(request, false, false);
+        ResultMessage resultMessage = new ResultMessage();
+        try {
+            String imgTempPath = this.attachmentService.setImgWaterMark(paraMap);
+            resultMessage.setData(imgTempPath);
+        } catch (Exception e) {
+            resultMessage.setResult(ResultMessage.Error);
+            logger.error(e.getMessage());
+            resultMessage.setMessage(e.getMessage());
+        }
+        return resultMessage;
+    }
 }
