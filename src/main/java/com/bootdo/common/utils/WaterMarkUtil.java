@@ -60,16 +60,19 @@ public class WaterMarkUtil {
                     // 设置颜色
                     // 设置字体及字号
                     // 设置起始位置
-                    content.setColorFill(Color.LIGHT_GRAY);
-                    content.setFontAndSize(base, 20);
+                    content.setColorFill(Color.lightGray);
+                    content.setFontAndSize(base, 50);
                     content.setTextMatrix(70, 200);
+                    PdfGState gs = new PdfGState();
+                    gs.setFillOpacity(0.3f);// 设置透明度为0.8
+                    content.setGState(gs);
 
                     Rectangle pageRect = reader.getPageSizeWithRotation(i);
                     float rectHeight = pageRect.getHeight();
                     float pageRectWidth = pageRect.getWidth();
 
-                    for (int height = 30; height < rectHeight; height = height + 25 * 2) {
-                        for (int width = 30; width < pageRectWidth; width = width + waterMark.length() * 30) {
+                    for (int height = 30; height < rectHeight; height = height + 50 * 2) {
+                        for (int width = 30; width < pageRectWidth; width = width + waterMark.length() * 50) {
                             content.showTextAligned(Element.ALIGN_LEFT, waterMark, width, height, 30);
                         }
                     }
