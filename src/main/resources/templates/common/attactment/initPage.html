@@ -667,13 +667,22 @@
             fileExt == 'png' ||
             fileExt == 'PNG'
         ) {
-            $("#readOnLineImg").attr("src", "/basePath/" + persistedFileName);
-            layer.open({
-                type: 1,
-                title: '在线预览',
-                area: ['80%', '80%'],
-                content: $("#readOnLineImgDialog"),
-                maxmin: true
+            $.ajaxExt({
+                url: "attactment/setImgWaterMark",
+                showWaitting: true,
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    $("#readOnLineImg").attr("src", "/tempPath/" + data.data);
+                    layer.open({
+                        type: 1,
+                        title: '在线预览',
+                        area: ['80%', '80%'],
+                        content: $("#readOnLineImgDialog"),
+                        maxmin: true
+                    });
+                }
             });
         } else {
             layer.msg("该文件不支持在线预览,请联系管理员!");
