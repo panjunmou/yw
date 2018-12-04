@@ -260,31 +260,50 @@
     function getPic(fileExt) {
         switch (fileExt.toLowerCase()) {
             case 'zip':
+            case 'ZIP':
             case 'tar':
+            case 'TAR':
             case 'rar':
+            case 'RAR':
             case '7z':
+            case '7Z':
                 return 'file_zip.png';
             case 'txt':
+            case 'TXT':
                 return 'file_txt.png';
             case 'sql':
+            case 'SQL':
             case 'java':
+            case 'JAVA':
                 return 'file_code.png';
             case 'html':
+            case 'HTML':
             case 'htm':
+            case 'HTM':
                 return 'file_txt.png';
             case 'doc':
+            case 'DOC':
             case 'docx':
+            case 'DOCX':
                 return 'file_word.png';
+            case 'XLSX':
             case 'xlsx':
             case 'xls':
+            case 'XLS':
                 return 'file_excel.png';
+            case 'JPG':
             case 'jpg':
+            case 'GIF':
             case 'gif':
+            case 'PNG':
             case 'png':
                 return 'file_img.png';
+            case 'PDF':
             case 'pdf':
                 return 'file_pdf.png';
+            case 'PPT':
             case 'ppt':
+            case 'PPTX':
             case 'pptx':
                 return 'file_ppt.png';
             case 'wmv':
@@ -399,15 +418,25 @@
                     var fileExt = checkedDiv.attr("fileExt");
                     if (
                         fileExt == 'doc' ||
+                        fileExt == 'DOC' ||
                         fileExt == 'docx' ||
+                        fileExt == 'DOCX' ||
                         fileExt == 'xlsx' ||
+                        fileExt == 'XLSX' ||
                         fileExt == 'xls' ||
+                        fileExt == 'XLS' ||
                         fileExt == 'jpg' ||
+                        fileExt == 'JPG' ||
                         fileExt == 'gif' ||
+                        fileExt == 'GIF' ||
                         fileExt == 'png' ||
+                        fileExt == 'PNG' ||
                         fileExt == 'pdf' ||
+                        fileExt == 'PDF' ||
                         fileExt == 'ppt' ||
-                        fileExt == 'pptx'
+                        fileExt == 'PPT' ||
+                        fileExt == 'pptx' ||
+                        fileExt == 'PPTX'
                     ) {
                         $("#readBtn").attr("disabled", false);
                     } else {
@@ -607,12 +636,19 @@
         var persistedFileName = checkedDiv.attr("persistedFileName");
         if (
             fileExt == 'doc' ||
+            fileExt == 'DOC' ||
             fileExt == 'docx' ||
+            fileExt == 'DOCX' ||
             fileExt == 'xlsx' ||
+            fileExt == 'XLSX' ||
             fileExt == 'xls' ||
+            fileExt == 'XLS' ||
             fileExt == 'pdf' ||
+            fileExt == 'PDF' ||
             fileExt == 'ppt' ||
-            fileExt == 'pptx'
+            fileExt == 'PPT' ||
+            fileExt == 'pptx' ||
+            fileExt == 'PPTX'
         ) {
             layer.open({
                 type: 2,
@@ -625,8 +661,11 @@
             });
         } else if (
             fileExt == 'jpg' ||
+            fileExt == 'JPG' ||
             fileExt == 'gif' ||
-            fileExt == 'png'
+            fileExt == 'GIF' ||
+            fileExt == 'png' ||
+            fileExt == 'PNG'
         ) {
             $.ajaxExt({
                 url: "attactment/setImgWaterMark",
@@ -645,14 +684,8 @@
                     });
                 }
             });
-            /*$("#readOnLineImg").attr("src", "/basePath/" + persistedFileName);
-            layer.open({
-                type: 1,
-                title: '在线预览',
-                area: ['80%', '80%'],
-                content: $("#readOnLineImgDialog"),
-                maxmin: true
-            });*/
+        } else {
+            layer.msg("该文件不支持在线预览,请联系管理员!");
         }
     }
 
